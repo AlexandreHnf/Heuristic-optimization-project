@@ -108,33 +108,60 @@ def swapValues(temp_sol, i, j):
     temp_sol[i] = temp_sol[j]
     temp_sol[j] = temp_val 
 
-def transposeNeighbourhood(sol, instance):
+def getBestTransposeNeighbour(sol, instance, pivoting_rule):
     """
     Two permutations ø, ø' are transpose neighbours if, and only if, 
     one can be obtained from the other by swapping the positions of two adjacent jobs
     ex : [A,B,C,D,E,F]
     =>   [A,C,B,D,E,F]
     """
+    best_sol = {"jobs": [], "wct": 10000000}
+    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
+    temp_instance.setProcessingTimes(instance.getProcessingTimes())
+    temp_instance.setWeights(instance.getWeights())
+
     for i in range(0, len(sol)-1):
         temp_sol = copy.copy(sol)
         swapValues(temp_sol, i, i+1)
+        wct = temp_instance.computeWCT(temp_sol)
+        if (wct < best_sol["wct"]):
+            best_sol["jobs"] = copy.copy(temp_sol)
+            best_sol["wct"] = wct
+            if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+                return best_sol
+
         print(temp_sol)
 
-def exchangeNeighbourhood(sol, instance):
+    return best_sol
+
+def getBestExchangeNeighbour(sol, instance, pivoting_rule):
     """
     Two permutations ø, ø' are 2-exchange neighbours if, and only if, 
     one can be obtained from the other by exchanging two jobs at arbitrary positions
     ex : [A,B,C,D,E,F]
     =>   [A,E,C,D,B,F]
     """
+    best_sol = {"jobs": [], "wct": 10000000}
+    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
+    temp_instance.setProcessingTimes(instance.getProcessingTimes())
+    temp_instance.setWeights(instance.getWeights())
+
     for i in range(len(sol)):
         for j in range(len(sol)):
             if (i != j):
                 temp_sol = copy.copy(sol)
                 swapValues(temp_sol, i, j)
-                print(temp_sol)
+                wct = temp_instance.computeWCT(temp_sol)
+                if (wct < best_sol["wct"]):
+                    best_sol["jobs"] = copy.copy(temp_sol)
+                    best_sol["wct"] = wct
+                    if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+                        return best_sol
 
-def insertionNeighbourhood(sol, instance):
+                print(temp_sol)
+    return best_sol
+
+def getBestInsertionNeighbour(sol, instance, pivoting_rule):
     """
     Two permutations ø, ø' are insertion neighbours if, and only if, 
     one can be obtained from the other by removing a job from one position 
@@ -144,6 +171,11 @@ def insertionNeighbourhood(sol, instance):
 
     QUESTION : l'insertion peuut se faire en fin de liste aussi ? 
     """
+    best_sol = {"jobs": [], "wct": 10000000}
+    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
+    temp_instance.setProcessingTimes(instance.getProcessingTimes())
+    temp_instance.setWeights(instance.getWeights())
+
     for i in range(len(sol)):
         for j in range(len(sol)+1):
             if (i != j and j != i+1): #to avoid useless solutions
@@ -153,7 +185,17 @@ def insertionNeighbourhood(sol, instance):
                     temp_sol.pop(i+1)
                 else:
                     temp_sol.pop(i)
+
+                wct = temp_instance.computeWCT(temp_sol)
+                if (wct < best_sol["wct"]):
+                    best_sol["jobs"] = copy.copy(temp_sol)
+                    best_sol["wct"] = wct
+                    if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+                        return best_sol
+
                 print(temp_sol)
+                
+    return best_sol
 
 def bestImprovement(sol, instance):
     """
@@ -168,22 +210,28 @@ def firstImprovement(sol, instance):
     pass     
 
 def isLocalOptimal(sol):
-    pass 
+    return sol["jobs"] == [] # if true => local optimum
 
-def chooseNeighbour():
-    pass 
+def chooseNeighbour(sol, instance, neighbour_type, pivoting_rule):
+    if (neighbour_type == "transpose"):
+        return getBestTransposeNeighbour(sol, instance, pivoting_rule) 
+    elif (neighbour_type == "exchange"):
+        return getBestExchangeNeighbour(sol, instance, pivoting_rule)
+    else:
+        return getBestInsertionNeighbour(sol, instance, pivoting_rule)
 
-
-def iterativeImprovement():
+def iterativeImprovement(args, instance):
     """
     Heuristic algorithm to find the optimal solution to the PSFP
     """
     pass
-    # solution = generateInitialSolution()
-    # while not isLocalOptimal(solution):
-    #     neighbour = chooseNeighbour()
-    #     solution = neighbour
+    solution = generateInitialSolution(args[1])
+    neighbour = chooseNeighbour(solution, instance, args[2])
+    while not isLocalOptimal(neighbour):
+        solution = copy.copy(neighbour["jobs"])
+        neighbour = chooseNeighbour(solution, instance, args[2])
 
+    return solution
 
 
 def main():
@@ -240,16 +288,42 @@ def main():
     test_sol = simplifiedRZheuristic(p_test)
     print("Initial Solution found : ", test_sol)
 
-    # test neighbourhood :
+    # test neighbourhood best improvement :
+
+    # print("transpose: ")
+    # st = getBestTransposeNeighbour(sol, p_test, "bestImprovement")
+    # print("best sol found : ", st)
+
+    # print("exchange: ")
+    # se = getBestExchangeNeighbour(sol, p_test, "bestImprovement")
+    # print("best sol found : ", se)
+
+    # print("insertion: ")
+    # si = getBestInsertionNeighbour(sol, p_test, "bestImprovement")
+    # print("best sol found : ", si)
+    
+
+    # test neighbourhood first improvement:
 
     print("transpose: ")
-    transposeNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
+    st = getBestTransposeNeighbour(sol, p_test, "firstImprovement")
+    print("best sol found : ", st)
 
     print("exchange: ")
-    exchangeNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
+    se = getBestExchangeNeighbour(sol, p_test, "firstImprovement")
+    print("best sol found : ", se)
 
     print("insertion: ")
-    insertionNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
+    si = getBestInsertionNeighbour(sol, p_test, "firstImprovement")
+    print("best sol found : ", si)
+
+    # test iterative improvement for the PSFP
+
+    best_sol = iterativeImprovement(args, instance)
+    print("best solution found by the iterative improvement for the PFSP pb : ", best_sol)
+
+
     
+
 if __name__ == "__main__":
     main()
