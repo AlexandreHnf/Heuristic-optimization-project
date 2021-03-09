@@ -96,8 +96,76 @@ def simplifiedRZheuristic(instance):
 
     return best_sol
 
-def generateInitialSolution():
-    pass 
+def generateInitialSolution(mode, instance):
+    if (mode == "random"):
+        return generateRndSol(instance.getNbJob())
+    else:
+        return simplifiedRZheuristic(instance)
+
+def swapValues(temp_sol, i, j):
+    # swap elements at position i and i + 1
+    temp_val = temp_sol[i]
+    temp_sol[i] = temp_sol[j]
+    temp_sol[j] = temp_val 
+
+def transposeNeighbourhood(sol, instance):
+    """
+    Two permutations ø, ø' are transpose neighbours if, and only if, 
+    one can be obtained from the other by swapping the positions of two adjacent jobs
+    ex : [A,B,C,D,E,F]
+    =>   [A,C,B,D,E,F]
+    """
+    for i in range(0, len(sol)-1):
+        temp_sol = copy.copy(sol)
+        swapValues(temp_sol, i, i+1)
+        print(temp_sol)
+
+def exchangeNeighbourhood(sol, instance):
+    """
+    Two permutations ø, ø' are 2-exchange neighbours if, and only if, 
+    one can be obtained from the other by exchanging two jobs at arbitrary positions
+    ex : [A,B,C,D,E,F]
+    =>   [A,E,C,D,B,F]
+    """
+    for i in range(len(sol)):
+        for j in range(len(sol)):
+            if (i != j):
+                temp_sol = copy.copy(sol)
+                swapValues(temp_sol, i, j)
+                print(temp_sol)
+
+def insertionNeighbourhood(sol, instance):
+    """
+    Two permutations ø, ø' are insertion neighbours if, and only if, 
+    one can be obtained from the other by removing a job from one position 
+    and inserting it at another position
+    ex : [A,B,C,D,E,F]
+    =>   [A,C,D,B,E,F]
+
+    QUESTION : l'insertion peuut se faire en fin de liste aussi ? 
+    """
+    for i in range(len(sol)):
+        for j in range(len(sol)+1):
+            if (i != j and j != i+1): #to avoid useless solutions
+                temp_sol = copy.copy(sol)
+                temp_sol.insert(j, sol[i])
+                if (j < i):
+                    temp_sol.pop(i+1)
+                else:
+                    temp_sol.pop(i)
+                print(temp_sol)
+
+def bestImprovement(sol, instance):
+    """
+    Choose best from all neighbours of sol
+    """
+     
+
+def firstImprovement(sol, instance):
+    """
+    Choose first improving neighbour (evaluate neighbours in fixed order)
+    """
+    pass     
 
 def isLocalOptimal(sol):
     pass 
@@ -126,6 +194,11 @@ def main():
     # if (len(sys.argv) == 1):
     #     print("Usage : fllowshopWCT <instance_file> ")
     #     return
+
+    # ARGUMENTS :
+    # neighbourhood : --transpose, -- exchange, --insertion
+    # initial solution : --random, --srz
+    # pivoting rule : --bestImprovement, --firstImprovement
 
     # Initialize random seed 
     random.seed(time.time())
@@ -167,6 +240,16 @@ def main():
     test_sol = simplifiedRZheuristic(p_test)
     print("Initial Solution found : ", test_sol)
 
+    # test neighbourhood :
+
+    print("transpose: ")
+    transposeNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
+
+    print("exchange: ")
+    exchangeNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
+
+    print("insertion: ")
+    insertionNeighbourhood(["A", "B", "C", "D", "E", "F"], instance)
     
 if __name__ == "__main__":
     main()
