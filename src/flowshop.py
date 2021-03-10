@@ -37,13 +37,13 @@ def randomPermutation(nb_jobs, sol):
 
         already_taken[j] = True 
 
-def generateRndSol(nb_jobs):
+def generateRndSol(instance):
     """
     Fill the solution with numbers between 0 and nb_jobs, shuffled
     """ 
-    sol = [i for i in range(nb_jobs)]
+    sol = [i for i in range(instance.getNbJob())]
     random.shuffle(sol)
-    return sol
+    return {"jobs": sol, "wct": instance.computeWCT(sol)}
 
 def getBestSubset(size, job, start, instance):
     # print("subset size : ", size)
@@ -58,7 +58,7 @@ def getBestSubset(size, job, start, instance):
         temp_instance.setWeights(instance.getWeights())
         wct = temp_instance.computeWCT(subset)
 
-        print(">", subset, wct)
+        # print(">", subset, wct)
         if (wct <= best_wct):
             best_subset = copy.copy(subset) 
             best_wct = wct
@@ -82,12 +82,12 @@ def simplifiedRZheuristic(instance):
     weighted_sums = {i: instance.weightedSumSingleJob(i) for i in range(instance.getNbJob())}
     starting_sequence= sorted(weighted_sums.items(), key=lambda x:x[1])
     
-    print("weighted sums: ", weighted_sums)
-    print("starting sequence : ", starting_sequence)
+    # print("weighted sums: ", weighted_sums)
+    # print("starting sequence : ", starting_sequence)
 
     best_sol = {"jobs":[], "wct": 100000000000} # step 1
     for j in range(len(starting_sequence)): # (job, T)
-        print("Step {0} = {1} with J{2}".format(j, best_sol, starting_sequence[j][0]))
+        # print("Step {0} = {1} with J{2}".format(j, best_sol, starting_sequence[j][0]))
 
         bests = getBestSubset(j+1, starting_sequence[j][0], best_sol["jobs"], instance)
         best_sol["jobs"] = bests[0]
@@ -98,7 +98,7 @@ def simplifiedRZheuristic(instance):
 
 def generateInitialSolution(mode, instance):
     if (mode == "random"):
-        return generateRndSol(instance.getNbJob())
+        return generateRndSol(instance)
     else:
         return simplifiedRZheuristic(instance)
 
@@ -116,21 +116,18 @@ def getBestTransposeNeighbour(sol, instance, pivoting_rule):
     =>   [A,C,B,D,E,F]
     """
     best_sol = {"jobs": [], "wct": 10000000}
-    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
-    temp_instance.setProcessingTimes(instance.getProcessingTimes())
-    temp_instance.setWeights(instance.getWeights())
 
     for i in range(0, len(sol)-1):
         temp_sol = copy.copy(sol)
         swapValues(temp_sol, i, i+1)
-        wct = temp_instance.computeWCT(temp_sol)
+        wct = instance.computeWCT(temp_sol)
         if (wct < best_sol["wct"]):
             best_sol["jobs"] = copy.copy(temp_sol)
             best_sol["wct"] = wct
             if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                 return best_sol
 
-        print(temp_sol)
+        # print(temp_sol)
 
     return best_sol
 
@@ -142,23 +139,20 @@ def getBestExchangeNeighbour(sol, instance, pivoting_rule):
     =>   [A,E,C,D,B,F]
     """
     best_sol = {"jobs": [], "wct": 10000000}
-    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
-    temp_instance.setProcessingTimes(instance.getProcessingTimes())
-    temp_instance.setWeights(instance.getWeights())
 
     for i in range(len(sol)):
         for j in range(len(sol)):
             if (i != j):
                 temp_sol = copy.copy(sol)
                 swapValues(temp_sol, i, j)
-                wct = temp_instance.computeWCT(temp_sol)
+                wct = instance.computeWCT(temp_sol)
                 if (wct < best_sol["wct"]):
                     best_sol["jobs"] = copy.copy(temp_sol)
                     best_sol["wct"] = wct
                     if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                         return best_sol
 
-                print(temp_sol)
+                # print(temp_sol)
     return best_sol
 
 def getBestInsertionNeighbour(sol, instance, pivoting_rule):
@@ -172,9 +166,6 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
     QUESTION : l'insertion peuut se faire en fin de liste aussi ? 
     """
     best_sol = {"jobs": [], "wct": 10000000}
-    temp_instance = pfsinstance.PfspInstance(instance.getNbJob(), instance.getNbMac())
-    temp_instance.setProcessingTimes(instance.getProcessingTimes())
-    temp_instance.setWeights(instance.getWeights())
 
     for i in range(len(sol)):
         for j in range(len(sol)+1):
@@ -186,28 +177,16 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
                 else:
                     temp_sol.pop(i)
 
-                wct = temp_instance.computeWCT(temp_sol)
+                wct = instance.computeWCT(temp_sol)
                 if (wct < best_sol["wct"]):
                     best_sol["jobs"] = copy.copy(temp_sol)
                     best_sol["wct"] = wct
                     if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                         return best_sol
 
-                print(temp_sol)
+                # print(temp_sol)
                 
     return best_sol
-
-def bestImprovement(sol, instance):
-    """
-    Choose best from all neighbours of sol
-    """
-     
-
-def firstImprovement(sol, instance):
-    """
-    Choose first improving neighbour (evaluate neighbours in fixed order)
-    """
-    pass     
 
 def isLocalOptimal(sol):
     return sol["jobs"] == [] # if true => local optimum
@@ -224,12 +203,15 @@ def iterativeImprovement(args, instance):
     """
     Heuristic algorithm to find the optimal solution to the PSFP
     """
-    pass
-    solution = generateInitialSolution(args[1])
-    neighbour = chooseNeighbour(solution, instance, args[2])
+    solution = generateInitialSolution(args[1], instance) # dictionary
+    neighbour = chooseNeighbour(solution["jobs"], instance, args[3], args[2])
+    it = 0
     while not isLocalOptimal(neighbour):
-        solution = copy.copy(neighbour["jobs"])
-        neighbour = chooseNeighbour(solution, instance, args[2])
+        solution["jobs"] = copy.copy(neighbour["jobs"])
+        solution["wct"] = neighbour["wct"]
+        print("it: {0} | {1} : {2}".format(it, solution["jobs"], solution["wct"]))
+        neighbour = chooseNeighbour(solution["jobs"], instance, args[3], args[2])
+        it += 1
 
     return solution
 
@@ -261,13 +243,8 @@ def main():
         return 
 
     # fill the vector with a random permutation
-    solution = generateRndSol(instance.getNbJob())
-
-    print("random solution ({0}): {1}".format(len(solution), solution))
-
-    # Compute the WCT of this solution
-    WCT = instance.computeWCT(solution)
-    print("Total weighted completion time : ", WCT)
+    solution = generateRndSol(instance)
+    print("random solution ", solution)
 
     # ==========================================================
     # ==================== TEST example ========================
@@ -290,40 +267,44 @@ def main():
 
     # test neighbourhood best improvement :
 
-    # print("transpose: ")
-    # st = getBestTransposeNeighbour(sol, p_test, "bestImprovement")
-    # print("best sol found : ", st)
+    print("transpose: ")
+    st = getBestTransposeNeighbour(sol, p_test, "bestImprovement")
+    print("best sol found : ", st)
 
-    # print("exchange: ")
-    # se = getBestExchangeNeighbour(sol, p_test, "bestImprovement")
-    # print("best sol found : ", se)
+    print("exchange: ")
+    se = getBestExchangeNeighbour(sol, p_test, "bestImprovement")
+    print("best sol found : ", se)
 
-    # print("insertion: ")
-    # si = getBestInsertionNeighbour(sol, p_test, "bestImprovement")
-    # print("best sol found : ", si)
+    print("insertion: ")
+    si = getBestInsertionNeighbour(sol, p_test, "bestImprovement")
+    print("best sol found : ", si)
     
 
     # test neighbourhood first improvement:
 
-    print("transpose: ")
-    st = getBestTransposeNeighbour(sol, p_test, "firstImprovement")
-    print("best sol found : ", st)
+    # print("transpose: ")
+    # st = getBestTransposeNeighbour(sol, p_test, "firstImprovement")
+    # print("best sol found : ", st)
 
-    print("exchange: ")
-    se = getBestExchangeNeighbour(sol, p_test, "firstImprovement")
-    print("best sol found : ", se)
+    # print("exchange: ")
+    # se = getBestExchangeNeighbour(sol, p_test, "firstImprovement")
+    # print("best sol found : ", se)
 
-    print("insertion: ")
-    si = getBestInsertionNeighbour(sol, p_test, "firstImprovement")
-    print("best sol found : ", si)
+    # print("insertion: ")
+    # si = getBestInsertionNeighbour(sol, p_test, "firstImprovement")
+    # print("best sol found : ", si)
 
     # test iterative improvement for the PSFP
 
-    best_sol = iterativeImprovement(args, instance)
-    print("best solution found by the iterative improvement for the PFSP pb : ", best_sol)
+    # best_sol = iterativeImprovement(sys.argv, instance)
+
+    # best_sol = iterativeImprovement(["flowshop.py", "random", "bestImprovement", "transpose"], p_test)
+    # print("best solution found by the iterative improvement for the PFSP pb : ", best_sol)
 
 
-    
+    # TODO : optimization to avoid recomputing the evalaution function from scratch
+    # when computing neighbourhood
+
 
 if __name__ == "__main__":
     main()
