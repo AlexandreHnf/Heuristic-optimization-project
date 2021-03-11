@@ -115,10 +115,11 @@ def getBestTransposeNeighbour(sol, instance, pivoting_rule):
     ex : [A,B,C,D,E,F]
     =>   [A,C,B,D,E,F]
     """
-    best_sol = {"jobs": [], "wct": 10000000}
+    best_sol = {"jobs": [], "wct": sol["wct"]}
+    print("sol init : ", sol)
 
-    for i in range(0, len(sol)-1):
-        temp_sol = copy.copy(sol)
+    for i in range(0, len(sol["jobs"])-1):
+        temp_sol = copy.copy(sol["jobs"])
         swapValues(temp_sol, i, i+1)
         wct = instance.computeWCT(temp_sol)
         if (wct < best_sol["wct"]):
@@ -127,7 +128,7 @@ def getBestTransposeNeighbour(sol, instance, pivoting_rule):
             if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                 return best_sol
 
-        # print(temp_sol)
+        print(temp_sol, wct)
 
     return best_sol
 
@@ -138,12 +139,13 @@ def getBestExchangeNeighbour(sol, instance, pivoting_rule):
     ex : [A,B,C,D,E,F]
     =>   [A,E,C,D,B,F]
     """
-    best_sol = {"jobs": [], "wct": 10000000}
+    best_sol = {"jobs": [], "wct": sol["wct"]}
+    print("sol init : ", sol)
 
-    for i in range(len(sol)):
-        for j in range(len(sol)):
+    for i in range(len(sol["jobs"])):
+        for j in range(len(sol["jobs"])):
             if (i != j):
-                temp_sol = copy.copy(sol)
+                temp_sol = copy.copy(sol["jobs"])
                 swapValues(temp_sol, i, j)
                 wct = instance.computeWCT(temp_sol)
                 if (wct < best_sol["wct"]):
@@ -152,7 +154,7 @@ def getBestExchangeNeighbour(sol, instance, pivoting_rule):
                     if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                         return best_sol
 
-                # print(temp_sol)
+                print(temp_sol, wct)
     return best_sol
 
 def getBestInsertionNeighbour(sol, instance, pivoting_rule):
@@ -165,13 +167,14 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
 
     QUESTION : l'insertion peuut se faire en fin de liste aussi ? 
     """
-    best_sol = {"jobs": [], "wct": 10000000}
+    best_sol = {"jobs": [], "wct": sol["wct"]}
+    print("sol init : ", sol)
 
-    for i in range(len(sol)):
-        for j in range(len(sol)+1):
+    for i in range(len(sol["jobs"])):
+        for j in range(len(sol["jobs"])+1):
             if (i != j and j != i+1): #to avoid useless solutions
-                temp_sol = copy.copy(sol)
-                temp_sol.insert(j, sol[i])
+                temp_sol = copy.copy(sol["jobs"])
+                temp_sol.insert(j, sol["jobs"][i])
                 if (j < i):
                     temp_sol.pop(i+1)
                 else:
@@ -184,7 +187,7 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
                     if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
                         return best_sol
 
-                # print(temp_sol)
+                print(temp_sol, wct)
                 
     return best_sol
 
@@ -204,13 +207,13 @@ def iterativeImprovement(args, instance):
     Heuristic algorithm to find the optimal solution to the PSFP
     """
     solution = generateInitialSolution(args[1], instance) # dictionary
-    neighbour = chooseNeighbour(solution["jobs"], instance, args[3], args[2])
+    neighbour = chooseNeighbour(solution, instance, args[3], args[2])
     it = 0
     while not isLocalOptimal(neighbour):
         solution["jobs"] = copy.copy(neighbour["jobs"])
         solution["wct"] = neighbour["wct"]
         print("it: {0} | {1} : {2}".format(it, solution["jobs"], solution["wct"]))
-        neighbour = chooseNeighbour(solution["jobs"], instance, args[3], args[2])
+        neighbour = chooseNeighbour(solution, instance, args[3], args[2])
         it += 1
 
     return solution
@@ -258,12 +261,13 @@ def main():
     for i in range(5):
         p_test.setWeight(i, w[i])
     
-    sol = [0,1,2,3,4]
-    print("WCT : ", p_test.computeWCT(sol))
+    jobs = [0,1,2,3,4]
+    sol = {"jobs": jobs, "wct": p_test.computeWCT(jobs)}
+    print("WCT : ", sol["wct"])
     p_test.showStats()
 
     test_sol = simplifiedRZheuristic(p_test)
-    print("Initial Solution found : ", test_sol)
+    print("Initial Solution found with SRZ: ", test_sol)
 
     # test neighbourhood best improvement :
 
