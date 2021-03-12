@@ -17,11 +17,12 @@ def randomPermutation(nb_jobs):
 	""" 
 	already_taken = [False for _ in range(nb_jobs)]
 	choosen_nb = [0 for _ in range(nb_jobs)]
-	sol = [0 for _ in range(nb_jobs)]
+	sol = [-1 for _ in range(nb_jobs)]
 
 	nbj = -1
 	for i in range(nb_jobs-1, -1, -1):
 		rnd = generateRndPosition(0, i)
+		print("rnd: ", rnd)
 		nb_false = 0
 
 		# find the rndth cell with value = false 
@@ -29,7 +30,9 @@ def randomPermutation(nb_jobs):
 		while (nb_false < rnd):
 			if (not already_taken[j]):
 				nb_false += 1
-			j += 1
+			j+=1
+		j-= 1
+		print(already_taken, j)
 
 		sol[j] = i 
 
@@ -221,6 +224,59 @@ def iterativeImprovement(args, instance):
 
 	return solution
 
+def variableNeighbourhoodDescent(args, neighbourhoods, instance):
+	"""
+	VND variable neighbourhood descent
+	use different neighbourhood mode throughout the algorithm
+	"""
+
+	solution = generateInitialSolution(args[1], instance) # dictionary
+	i = 0
+	it = 0
+	while i > len(neighbourhoods):
+		print("neighbourhood mode : ", n)
+		neighbour = chooseNeighbour(solution, instance, neighbourhoods[i], "firstImprovement")
+		if (isLocalOptimal(neighbour)): # if no existing improving solution
+			i += 1
+		else:
+			solution["jobs"] = copy.copy(neighbour["jobs"])
+			solution["wct"] = neighbour["wct"]
+			print("it: {0} | {1} : {2}".format(it, solution["jobs"], solution["wct"]))
+			i = 0
+			it += 1
+
+	return solution
+
+def averageRelativePercentageDev(deltas):
+	"""
+	Returns the average relative percentage deviation of all instances of algorithm k
+	algorithm k = a combination of different mode
+		for example : --random --firstImprovement --tranpose
+	"""
+	return sum(delta) / len(delta) 
+
+
+def readBestKnownWCT(filename):
+	"""
+	Read the instance best known WCT file
+	filename = bestSolutions.txt
+	"""
+
+	best_knowns = {}
+	try:
+		with open(filename) as fileIn:
+			lines = fileIn.readlines()[1:] # we ignore the first line 
+			for line in lines:
+				l = line.strip().split(" , ")
+				best_knowns[l[0]] = float(l[1]) # filename : best score
+
+	
+	except FileNotFoundError:
+		print("File does not exist : ", filename)
+	except:
+		print("Other error")
+
+	return best_knowns
 
 def main():
 	
@@ -239,6 +295,14 @@ def main():
 	# Initialize random seed 
 	random.seed(time.time())
 
+
+	print("-----------------------------------")
+	# test read bestSolutions.txt file 
+	bestSolutionsFile = "/home/alexandre_hnf/Desktop/MA2/Heuristic Optimization/Heuristic-optimization-project/src/instances/bestSolutions.txt"
+	best_knowns = readBestKnownWCT(bestSolutionsFile)
+	print("best knowns : ", best_knowns)
+
+
 	#create instance object 
 	instance = pfsinstance.PfspInstance()
 
@@ -248,6 +312,11 @@ def main():
 	# if (not instance.readDataFromFile(argv[1])):
 	if (not instance.readDataFromFile(filenameU)):
 		return 
+	
+	instance_name = "{0}_{1}_{2}".format(instance.getNbJob(), instance.getNbMac(), filenameU.split("_")[-1])
+	print("instance name : ", instance_name)
+	instance.setBestKnownWCT(best_knowns[instance_name])
+	print("instance best known WCT : ", instance.getBestKnownWCT())
 
 	# fill the vector with a random permutation
 	print("-----------------------------------")
@@ -326,6 +395,21 @@ def main():
 	# when computing neighbourhood
 
 	# TODO : change the generate random solution function (to have an uniform random generation)
+
+	print("-----------------------------------")
+	sol_random3 = randomPermutation(8)
+	print("random solution 3 : ", sol_random3)
+
+
+	print("-----------------------------------")
+	# Test all combination of II-PFSP on all instances 
+
+
+	print("-----------------------------------")
+	# Test all combination of VND-PFSP on all instances
+	neighbourhoods1 = ["transpose", "exchange", "insert"] 
+	neighbourhoods2 = ["transpose", "insert", "exchange"]
+
 
 
 if __name__ == "__main__":
