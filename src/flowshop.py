@@ -15,6 +15,7 @@ def randomPermutation(nb_jobs):
 	"""
 	Fill the solution with numbers between 0 and nb_jobs, shuffled
 	""" 
+	# TODO : fix the generate random solution function (to have an uniform random generation)
 	already_taken = [False for _ in range(nb_jobs)]
 	choosen_nb = [0 for _ in range(nb_jobs)]
 	sol = [-1 for _ in range(nb_jobs)]
@@ -22,7 +23,7 @@ def randomPermutation(nb_jobs):
 	nbj = -1
 	for i in range(nb_jobs-1, -1, -1):
 		rnd = generateRndPosition(0, i)
-		print("rnd: ", rnd)
+		# print("rnd: ", rnd)
 		nb_false = 0
 
 		# find the rndth cell with value = false 
@@ -32,7 +33,7 @@ def randomPermutation(nb_jobs):
 				nb_false += 1
 			j+=1
 		j-= 1
-		print(already_taken, j)
+		# print(already_taken, j)
 
 		sol[j] = i 
 
@@ -49,20 +50,20 @@ def generateRndSol(instance):
 	""" 
 	sol = [i for i in range(instance.getNbJob())]
 	random.shuffle(sol)
-	return {"jobs": sol, "wct": instance.computeWCT(sol)}
+	return {"jobs": sol, "wct": instance.computeWCT3(sol)}
 
 def getBestSubset(size, job, start, instance):
 	# print("subset size : ", size)
 	subset = start
 	best_subset = []
-	best_wct = 100000
+	best_wct = 10000000000
 	for i in range(size):
 		subset.insert(i, job)
 
 		temp_instance = pfsinstance.PfspInstance(len(subset), instance.getNbMac())
 		temp_instance.setProcessingTimes(instance.getProcessingTimes())
 		temp_instance.setWeights(instance.getWeights())
-		wct = temp_instance.computeWCT(subset)
+		wct = temp_instance.computeWCT3(subset)
 
 		# print(">", subset, wct)
 		if (wct <= best_wct):
@@ -88,8 +89,8 @@ def simplifiedRZheuristic(instance):
 	weighted_sums = {i: instance.weightedSumSingleJob(i) for i in range(instance.getNbJob())}
 	starting_sequence= sorted(weighted_sums.items(), key=lambda x:x[1])
 	
-	# print("weighted sums: ", weighted_sums)
-	# print("starting sequence : ", starting_sequence)
+	# print("weighted sums: ", weighted_sums, len(weighted_sums))
+	# print("starting sequence : ", starting_sequence, len(starting_sequence))
 
 	best_sol = {"jobs":[], "wct": 100000000000} # step 1
 	for j in range(len(starting_sequence)): # (job, T)
@@ -100,12 +101,13 @@ def simplifiedRZheuristic(instance):
 		best_sol["wct"] = bests[1]
 		# print("best : ", best_sol)
 
+
 	return best_sol
 
 def generateInitialSolution(mode, instance):
-	if (mode == "random"):
+	if (mode == "R"):
 		return generateRndSol(instance)
-	else:
+	elif (mode == "SRZ"):
 		return simplifiedRZheuristic(instance)
 
 def swapValues(temp_sol, i, j):
@@ -122,16 +124,16 @@ def getBestTransposeNeighbour(sol, instance, pivoting_rule):
 	=>   [A,C,B,D,E,F]
 	"""
 	best_sol = {"jobs": [], "wct": sol["wct"]}
-	print("sol init : ", sol)
+	# print("sol init : ", sol)
 
 	for i in range(0, len(sol["jobs"])-1):
 		temp_sol = copy.copy(sol["jobs"])
 		swapValues(temp_sol, i, i+1)
-		wct = instance.computeWCT(temp_sol)
+		wct = instance.computeWCT3(temp_sol)
 		if (wct < best_sol["wct"]):
 			best_sol["jobs"] = copy.copy(temp_sol)
 			best_sol["wct"] = wct
-			if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+			if (pivoting_rule == "FI"): # stop directly after 1 sol found
 				return best_sol
 
 		# print(temp_sol, wct)
@@ -146,18 +148,18 @@ def getBestExchangeNeighbour(sol, instance, pivoting_rule):
 	=>   [A,E,C,D,B,F]
 	"""
 	best_sol = {"jobs": [], "wct": sol["wct"]}
-	print("sol init : ", sol)
+	# print("sol init : ", sol)
 
 	for i in range(len(sol["jobs"])):
 		for j in range(len(sol["jobs"])):
 			if (i != j):
 				temp_sol = copy.copy(sol["jobs"])
 				swapValues(temp_sol, i, j)
-				wct = instance.computeWCT(temp_sol)
+				wct = instance.computeWCT3(temp_sol)
 				if (wct < best_sol["wct"]):
 					best_sol["jobs"] = copy.copy(temp_sol)
 					best_sol["wct"] = wct
-					if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+					if (pivoting_rule == "FI"): # stop directly after 1 sol found
 						return best_sol
 
 				# print(temp_sol, wct)
@@ -174,7 +176,7 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
 	QUESTION : l'insertion peuut se faire en fin de liste aussi ? 
 	"""
 	best_sol = {"jobs": [], "wct": sol["wct"]}
-	print("sol init : ", sol)
+	# print("sol init : ", sol)
 
 	for i in range(len(sol["jobs"])):
 		for j in range(len(sol["jobs"])+1):
@@ -186,11 +188,11 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
 				else:
 					temp_sol.pop(i)
 
-				wct = instance.computeWCT(temp_sol)
+				wct = instance.computeWCT3(temp_sol)
 				if (wct < best_sol["wct"]):
 					best_sol["jobs"] = copy.copy(temp_sol)
 					best_sol["wct"] = wct
-					if (pivoting_rule == "firstImprovement"): # stop directly after 1 sol found
+					if (pivoting_rule == "FI"): # stop directly after 1 sol found
 						return best_sol
 
 				# print(temp_sol, wct)
@@ -198,19 +200,29 @@ def getBestInsertionNeighbour(sol, instance, pivoting_rule):
 	return best_sol
 
 def isLocalOptimal(sol):
+	"""
+	Check if the solution is a local optimum. By definition, a local optimum (here minimum) is :
+	search position without improving neighbours w.r.t. given evaluation function g and neighbourhood
+	N. i.e. position s in S such that g(s) <= g(s') for all s' of N(s). 
+	=> same as checking if the neighbour found is empty. (if empty : sol is a local optimum)
+	"""
 	return sol["jobs"] == [] # if true => local optimum
 
 def chooseNeighbour(sol, instance, neighbour_type, pivoting_rule):
-	if (neighbour_type == "transpose"):
+	"""
+	Choose one neighbour (the best one) among all the neighbours of a given solution. 
+	"""
+	if (neighbour_type == "T"):
 		return getBestTransposeNeighbour(sol, instance, pivoting_rule) 
-	elif (neighbour_type == "exchange"):
+	elif (neighbour_type == "E"):
 		return getBestExchangeNeighbour(sol, instance, pivoting_rule)
-	else:
+	elif (neighbour_type == "I"):
 		return getBestInsertionNeighbour(sol, instance, pivoting_rule)
 
 def iterativeImprovement(args, instance):
 	"""
 	Heuristic algorithm to find the optimal solution to the PSFP
+	args = [name.py, initsol, pivotingrule, neighbourhood]
 	"""
 	solution = generateInitialSolution(args[1], instance) # dictionary
 	neighbour = chooseNeighbour(solution, instance, args[3], args[2])
@@ -218,24 +230,25 @@ def iterativeImprovement(args, instance):
 	while not isLocalOptimal(neighbour):
 		solution["jobs"] = copy.copy(neighbour["jobs"])
 		solution["wct"] = neighbour["wct"]
-		print("it: {0} | {1} : {2}".format(it, solution["jobs"], solution["wct"]))
+		# print("it: {0} | {1} : {2}".format(it, solution["jobs"], solution["wct"]))
 		neighbour = chooseNeighbour(solution, instance, args[3], args[2])
 		it += 1
 
 	return solution
 
-def variableNeighbourhoodDescent(args, neighbourhoods, instance):
+def variableNeighbourhoodDescent(initsolRule, neighbourhoods, instance):
 	"""
 	VND variable neighbourhood descent
 	use different neighbourhood mode throughout the algorithm
+	args = [name.py, initsol, pivotingrule, neighbourhood]
 	"""
 
-	solution = generateInitialSolution(args[1], instance) # dictionary
+	solution = generateInitialSolution(initsolRule, instance) # dictionary
 	i = 0
 	it = 0
 	while i > len(neighbourhoods):
 		print("neighbourhood mode : ", n)
-		neighbour = chooseNeighbour(solution, instance, neighbourhoods[i], "firstImprovement")
+		neighbour = chooseNeighbour(solution, instance, neighbourhoods[i], "FI")
 		if (isLocalOptimal(neighbour)): # if no existing improving solution
 			i += 1
 		else:
@@ -278,139 +291,3 @@ def readBestKnownWCT(filename):
 
 	return best_knowns
 
-def main():
-	
-	# ==========================================================
-	# ================= TEST WCT ======================
-	# ==========================================================
-	# if (len(sys.argv) == 1):
-	#     print("Usage : fllowshopWCT <instance_file> ")
-	#     return
-
-	# ARGUMENTS :
-	# neighbourhood : --transpose, -- exchange, --insertion
-	# initial solution : --random, --srz
-	# pivoting rule : --bestImprovement, --firstImprovement
-
-	# Initialize random seed 
-	random.seed(time.time())
-
-
-	print("-----------------------------------")
-	# test read bestSolutions.txt file 
-	bestSolutionsFile = "/home/alexandre_hnf/Desktop/MA2/Heuristic Optimization/Heuristic-optimization-project/src/instances/bestSolutions.txt"
-	best_knowns = readBestKnownWCT(bestSolutionsFile)
-	print("best knowns : ", best_knowns)
-
-
-	#create instance object 
-	instance = pfsinstance.PfspInstance()
-
-	# read data from file
-	filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\instances\\50_20_01"
-	filenameU = "/home/alexandre_hnf/Desktop/MA2/Heuristic Optimization/Heuristic-optimization-project/src/instances/50_20_01"
-	# if (not instance.readDataFromFile(argv[1])):
-	if (not instance.readDataFromFile(filenameU)):
-		return 
-	
-	instance_name = "{0}_{1}_{2}".format(instance.getNbJob(), instance.getNbMac(), filenameU.split("_")[-1])
-	print("instance name : ", instance_name)
-	instance.setBestKnownWCT(best_knowns[instance_name])
-	print("instance best known WCT : ", instance.getBestKnownWCT())
-
-	# fill the vector with a random permutation
-	print("-----------------------------------")
-	sol_random1 = generateRndSol(instance)
-	print("random solution : ", sol_random1)
-
-	print("-----------------------------------")
-	sol_random2 = randomPermutation(instance.getNbJob())
-	print("random solution 2 : ", sol_random2)
-
-
-	# ==========================================================
-	# ==================== TEST example ========================
-	# ==========================================================
-
-	print("TEST WCT")
-	p_test = pfsinstance.PfspInstance(5, 3) # 5 jobs, 3 machines
-	# p_test.allowMatrixMemory()
-	p_test.processing_times = [[3,2,4], [3,1,2], [4,3,1], [2,3,2], [3,1,3]]
-	w = [1,2,4,2,3]
-	for i in range(5):
-		p_test.setWeight(i, w[i])
-	
-	jobs = [0,1,2,3,4]
-	sol = {"jobs": jobs, "wct": p_test.computeWCT(jobs)}
-	print("WCT : ", sol["wct"])
-	p_test.showStats()
-
-	test_sol = simplifiedRZheuristic(p_test)
-	print("Initial Solution found with SRZ: ", test_sol)
-
-	# test neighbourhood best improvement :
-	print("-----------------------------------")
-	print("AVEC BEST IMPROVEMENT")
-
-	print("transpose: ")
-	st = getBestTransposeNeighbour(sol, p_test, "bestImprovement")
-	print("best sol found : ", st)
-
-	print("exchange: ")
-	se = getBestExchangeNeighbour(sol, p_test, "bestImprovement")
-	print("best sol found : ", se)
-
-	print("insertion: ")
-	si = getBestInsertionNeighbour(sol, p_test, "bestImprovement")
-	print("best sol found : ", si)
-	
-
-	# test neighbourhood first improvement:
-	print("-----------------------------------")
-	print("AVEC FIRST IMPROVEMENT")
-
-	print("transpose: ")
-	st = getBestTransposeNeighbour(sol, p_test, "firstImprovement")
-	print("best sol found : ", st)
-
-	print("exchange: ")
-	se = getBestExchangeNeighbour(sol, p_test, "firstImprovement")
-	print("best sol found : ", se)
-
-	print("insertion: ")
-	si = getBestInsertionNeighbour(sol, p_test, "firstImprovement")
-	print("best sol found : ", si)
-
-	# test iterative improvement for the PSFP
-	print("-----------------------------------")
-	print("TEST ITERATIVE IMPROVEMENT FOR PSFP")
-
-	# best_sol = iterativeImprovement(sys.argv, instance)
-
-	best_sol = iterativeImprovement(["flowshop.py", "random", "bestImprovement", "transpose"], p_test)
-	print("best solution found by the iterative improvement for the PFSP pb : ", best_sol)
-
-
-	# TODO : optimization to avoid recomputing the evalaution function from scratch
-	# when computing neighbourhood
-
-	# TODO : change the generate random solution function (to have an uniform random generation)
-
-	print("-----------------------------------")
-	sol_random3 = randomPermutation(8)
-	print("random solution 3 : ", sol_random3)
-
-
-	print("-----------------------------------")
-	# Test all combination of II-PFSP on all instances 
-
-
-	print("-----------------------------------")
-	# Test all combination of VND-PFSP on all instances
-	neighbourhoods1 = ["transpose", "exchange", "insert"] 
-	neighbourhoods2 = ["transpose", "insert", "exchange"]
-
-
-
-if __name__ == "__main__":
-	main()

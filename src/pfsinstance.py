@@ -12,7 +12,9 @@ class PfspInstance:
 		self.sct = 0 # sum of completion times 
 		if (self.nb_jobs > 0 and self.nb_mach > 0):
 			self.allowMatrixMemory()
-		self.best_known_wct = 0
+		self.best_known_wct = 0.01 # to avoid division by 0
+		self.name = ""
+		self.prev_CT = [] # completion times
 
 		# print("nb jobs: ", self.nb_jobs)
 		# print("nb mach: ", self.nb_mach)
@@ -23,6 +25,15 @@ class PfspInstance:
 
 	def getNbMac(self):
 		return self.nb_mach
+
+	def setName(self, filename):
+		self.name = "{0}_{1}_{2}".format(self.getNbJob(), self.getNbMac(), filename.split("_")[-1])
+
+	def getName(self):
+		return self.name
+
+	def allowCTmemory(self):
+		self.prev_CT = [[-1 for _ in range(self.nb_jobs)] for _ in range(self.nb_mach)]
 
 	def allowMatrixMemory(self):
 		self.processing_times = [[0 for _ in range(self.nb_mach)] for _ in range(self.nb_jobs)]
@@ -134,17 +145,120 @@ class PfspInstance:
 
 		return 100 * ((best_sol["wct"] - self.best_known_wct) / self.best_known_wct)
 
+	# def computeWCT2(self, sol, save=False):
+	# 	job_nb = 0
+	# 	# completion_times = [[-1 for _ in range(self.nb_jobs)] for _ in range(self.nb_mach)]
+	# 	wct = 0
+	# 	prev_mach_endtime = 0
+	# 	prev_job_endtime = [None for _ in range(self.nb_jobs)]
+	#
+	# 	# first column = first job completion times
+	# 	for m in range(self.nb_mach):
+	# 		job_nb = sol[0]
+	# 		if (m == 0): # first mach
+	# 			# self.prev_CT[m][0] = self.processing_times[job_nb][m]
+	# 			prev_job_endtime[0] = self.processing_times[job_nb][m]
+	# 		else:
+	# 			# self.prev_CT[m][0] = self.prev_CT[m-1][0] + self.processing_times[job_nb][m]
+	# 			prev_job_endtime[m] = prev_job_endtime[m-1] + self.processing_times[job_nb][m]
+	# 	# wct += self.weights[job_nb] * self.prev_CT[self.nb_mach-1][0] # update first Wi.Ci
+	# 	wct += self.weights[job_nb] * prev_job_endtime[self.nb_mach-1]
+	#
+	# 	# columns 1 to column n
+	# 	for j in range(1, self.nb_jobs):
+	# 		job_nb = sol[j]
+	# 		for m in range(1, self.nb_mach):
+	# 			# first line
+	# 			self.prev_CT[0][j] = self.prev_CT[0][j-1] + self.processing_times[job_nb][0]
+	# 			# other lines
+	# 			max_CT_neighbour = max(self.prev_CT[m][j-1], self.prev_CT[m-1][j])
+	# 			self.prev_CT[m][j] = max_CT_neighbour + self.processing_times[job_nb][m]
+	#
+	# 		# update wct
+	# 		wct += self.weights[job_nb] * self.prev_CT[self.nb_mach-1][j]
+	#
+	# 	# if save:
+	# 	# 	self.prev_CT = completion_times
+	#
+	# 	self.wct = wct
+	# 	self.sct = sum(self.prev_CT[self.nb_mach-1]) # sum of last line of completion times
+	# 	self.makespan = self.prev_CT[self.nb_mach-1][-1]  # last completion time
+	# 	# attention, ici jen 'ai pas update makespan et sum of completion times
+	# 	# print(completion_times)
+	# 	return wct
+
+	def computeWCT3(self, sol, offset=0, save=False):
+		"""
+		Compute Weighted Completion Time of a solution
+		"""
+		job_nb = 0
+
+		# We need end times on previous machine
+		prev_mach_endtime = [None for _ in range(self.nb_jobs)]  # length = nb_jobs
+		prev_job_endtime = 0
+
+		# first machine : => horizontal line (pi1)
+		prev_mach_endtime[0] = 0
+		for j in range(self.nb_jobs):
+			job_nb = sol[j]
+			prev = 0  # if 1st job previous elements (= None)
+			if (j - 1 > -1):
+				prev = prev_mach_endtime[j - 1]
+			if j < offset: # we keep the previous completion times from memory
+				prev_mach_endtime[j] = self.prev_CT[0][j]
+			else:
+				prev_mach_endtime[j] = prev + self.processing_times[job_nb][0]
+			if save: self.prev_CT[0][j] = prev_mach_endtime[j]
+
+		start_col = offset
+		if offset == 0:
+			start_col = 1
+		for m in range(1, self.nb_mach): # LIGNS
+			if offset == 0: # if 2nd column, we must compute first column value
+				prev_mach_endtime[0] += self.processing_times[sol[0]][m]
+				prev_job_endtime = prev_mach_endtime[0]
+			if offset > 0:
+				prev_job_endtime = self.prev_CT[m][offset-1] # pre stored value (prev column)
+
+			if save : self.prev_CT[m][0] = prev_mach_endtime[0]
+
+			for j in range(start_col, self.nb_jobs): # COLUMNS
+				job_nb = sol[j]
+				if (prev_mach_endtime[j] > prev_job_endtime):
+					prev_mach_endtime[j] = prev_mach_endtime[j] + self.processing_times[job_nb][m]
+					prev_job_endtime = prev_mach_endtime[j]
+				else:
+					prev_job_endtime += self.processing_times[job_nb][m]
+					prev_mach_endtime[j] = prev_job_endtime
+
+				if save: self.prev_CT[m][j] = prev_mach_endtime[j]
+
+		wct = 0
+		for j in range(self.nb_jobs):
+			if (j < offset):
+				wct += self.prev_CT[self.nb_mach-1][j] * self.weights[sol[j]]
+			else:
+				wct += prev_mach_endtime[j] * self.weights[sol[j]]
+
+		self.wct = wct
+		self.sct = sum(prev_mach_endtime)
+		self.makespan = prev_mach_endtime[-1]  # last completion time
+
+		return wct
+
 	def computeWCT(self, sol):
 		"""
 		Compute Weighted Completion Time of a solution
 		"""
+		# TODO : optimization to avoid recomputing the evalaution function from scratch
+		# when computing neighbourhood
 		job_nb = 0
 
 		#We need end times on previous machine 
 		prev_mach_endtime = [None for _ in range(self.nb_jobs)] # length = nb_jobs
 		prev_job_endtime = 0 
 
-		# first machine :
+		# first machine : => horizontal line (pi1)
 		prev_mach_endtime[0] = 0
 		for j in range(self.nb_jobs):
 			job_nb = sol[j]
