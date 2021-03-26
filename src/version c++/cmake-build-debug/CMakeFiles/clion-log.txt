@@ -1,0 +1,4 @@
+"C:\Program Files\JetBrains\CLion 2020.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" "D:\Users\Alexandre\Desktop\ULB\MA2\Heuristic optimization\Projet\repository\Heuristic-optimization-project\src\version c++"
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/cmake-build-debug

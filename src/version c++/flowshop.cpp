@@ -1,3 +1,7 @@
+//
+// Created by Alexandre on 0026 26 mars 2021.
+//
+
 /***************************************************************************
  *   Copyright (C) 2012 by Jérémie Dubois-Lacoste   *
  *   jeremie.dl@gmail.com   *
@@ -23,7 +27,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 #include "pfspinstance.h"
+#include "flowshop.h"
 
 using namespace std;
 
@@ -36,73 +42,40 @@ int generateRndPosition(int min, int max) {
 /* Fill the solution with numbers between 1 and nbJobs, shuffled */
 void randomPermutation(int nbJobs, vector< int > & sol)
 {
-  vector<bool> alreadyTaken(nbJobs+1, false); // nbJobs elements with value false
-  vector<int > choosenNumber(nbJobs+1, 0);
+    vector<bool> alreadyTaken(nbJobs, false); // nbJobs elements with value false
+    vector<int > choosenNumber(nbJobs, 0);
 
-  int nbj;
-  int rnd, i, j, nbFalse;
+    int nbj;
+    int rnd, i, j, nbFalse;
 
-  nbj = 0;
-  for (i = nbJobs; i >= 1; --i)
-  {
-    rnd = generateRndPosition(1, i);
-    nbFalse = 0;
+    nbj = -1;
+    for (i = nbJobs-1; i >= 0; --i)
+    {
+        rnd = generateRndPosition(0, i);
+        nbFalse = 0;
 
-    /* find the rndth cell with value = false : */
-    for (j = 1; nbFalse < rnd; ++j)
-      if ( ! alreadyTaken[j] )
-        ++nbFalse;
-    --j;
+        /* find the rndth cell with value = false : */
+        for (j = 0; nbFalse < rnd; ++j)
+            if ( ! alreadyTaken[j] )
+                ++nbFalse;
+        --j;
 
-    sol[j] = i;
+        sol[j] = i;
 
-    ++nbj;
-    choosenNumber[nbj] = j;
+        ++nbj;
+        choosenNumber[nbj] = j;
 
-    alreadyTaken[j] = true;
-  }
+        alreadyTaken[j] = true;
+    }
+}
+
+std::vector<int> generateRndSol(int nbJ) {
+    std::vector<int> sol(nbJ);
+    for (int i=0; i<nbJ; i++) {
+        sol[i] = i;
+    }
+    random_shuffle(sol.begin(), sol.end());
+    return sol;
 }
 
 /***********************************************************************/
-
-int main(int argc, char *argv[])
-{
-  int i;
-  long int WeightedSumCompletionTimes;
-
-
-  if (argc == 1)
-  {
-    cout << "Usage: ./flowshopWCT <instance_file>" << endl;
-    return 0;
-  }
-
-  /* initialize random seed: */
-  srand ( time(NULL) );
-
-  /* Create instance object */
-  PfspInstance instance;
-
-  /* Read data from file */
-  if (! instance.readDataFromFile(argv[1]) )
-    return 1;
-
-  /* Create a vector of int to represent the solution
-    WARNING: By convention, we store the jobs starting from index 1,
-             thus the size nbJob + 1. */
-  vector< int > solution ( instance.getNbJob()+ 1 );
-
-  /* Fill the vector with a random permutation */
-  randomPermutation(instance.getNbJob(), solution);
-
-  cout << "Random solution: " ;
-  for (i = 1; i <= instance.getNbJob(); ++i)
-    cout << solution[i] << " " ;
-  cout << endl;
-
-  /* Compute the WCT of this solution */
-  WeightedSumCompletionTimes = instance.computeWCT(solution);
-  cout << "Total weighted completion time: " << WeightedSumCompletionTimes << endl;
-
-  return 0;
-}

@@ -54,7 +54,7 @@ void PfspInstance::allowMatrixMemory(int nbJ, int nbM)
 {
   processingTimesMatrix.resize(nbJ+1);          // 1st dimension
 
-  for (int cpt = 0; cpt < nbJ+1; ++cpt)
+  for (int cpt = 0; cpt < nbJ; ++cpt)
     processingTimesMatrix[cpt].resize(nbM+1); // 2nd dimension
 
 	dueDates.resize(nbJ+1);
