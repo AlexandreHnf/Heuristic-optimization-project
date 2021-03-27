@@ -19,6 +19,8 @@ ctime
 -
 algorithm
 -
+bits/stdc++.h
+-
 pfspinstance.h
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 flowshop.h
@@ -41,20 +43,6 @@ pfspinstance.h
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 flowshop.h
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
-fstream
--
-
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.cpp
-iostream
--
-fstream
--
-cmath
--
-cstring
--
-pfspinstance.h
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 string

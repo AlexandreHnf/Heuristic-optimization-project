@@ -65,7 +65,7 @@ def getBestSubset(size, job, start, instance):
 		temp_instance.setWeights(instance.getWeights())
 		wct = temp_instance.computeWCT3(subset)
 
-		# print(">", subset, wct)
+		print(">", subset, wct)
 		if (wct <= best_wct):
 			best_subset = copy.copy(subset) 
 			best_wct = wct
@@ -90,7 +90,7 @@ def simplifiedRZheuristic(instance):
 	starting_sequence= sorted(weighted_sums.items(), key=lambda x:x[1])
 	
 	# print("weighted sums: ", weighted_sums, len(weighted_sums))
-	# print("starting sequence : ", starting_sequence, len(starting_sequence))
+	print("starting sequence : ", starting_sequence, len(starting_sequence))
 
 	best_sol = {"jobs":[], "wct": 100000000000} # step 1
 	for j in range(len(starting_sequence)): # (job, T)

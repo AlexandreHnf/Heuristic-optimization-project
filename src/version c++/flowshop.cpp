@@ -28,45 +28,24 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <bits/stdc++.h>
 #include "pfspinstance.h"
 #include "flowshop.h"
 
 using namespace std;
 
-
-int generateRndPosition(int min, int max) {
-    return ( rand() % max + min );
+void printVector(vector<int> v, string message) {
+    cout << message;
+    for (int i=0; i<v.size(); i++){
+        cout << v[i] << " ";
+    }
+    cout << endl;
 }
 
-
-/* Fill the solution with numbers between 1 and nbJobs, shuffled */
-void randomPermutation(int nbJobs, vector< int > & sol)
-{
-    vector<bool> alreadyTaken(nbJobs, false); // nbJobs elements with value false
-    vector<int > choosenNumber(nbJobs, 0);
-
-    int nbj;
-    int rnd, i, j, nbFalse;
-
-    nbj = -1;
-    for (i = nbJobs-1; i >= 0; --i)
-    {
-        rnd = generateRndPosition(0, i);
-        nbFalse = 0;
-
-        /* find the rndth cell with value = false : */
-        for (j = 0; nbFalse < rnd; ++j)
-            if ( ! alreadyTaken[j] )
-                ++nbFalse;
-        --j;
-
-        sol[j] = i;
-
-        ++nbj;
-        choosenNumber[nbj] = j;
-
-        alreadyTaken[j] = true;
-    }
+void printSol(Solution s) {
+    cout << "-----" << endl;
+    printVector(s.sol, "jobs : ");
+    cout << "wct : " << s.wct << endl;
 }
 
 std::vector<int> generateRndSol(int nbJ) {
@@ -79,3 +58,60 @@ std::vector<int> generateRndSol(int nbJ) {
 }
 
 /***********************************************************************/
+
+vector<int> getInitSRZsol(PfspInstance instance) {
+    multimap<double, int > mymap; // sorted map in ascending order of the keys
+
+    for (int i = 0; i < instance.getNbJob(); i++) {
+        mymap.insert(make_pair(instance.weightedSumSingleJob(i), i));
+    }
+
+    vector<int> init_sol(0);
+    // begin() returns to the first value of multimap.
+    multimap<double,int> :: iterator it;
+    for (it = mymap.begin() ; it != mymap.end() ; it++) {
+        init_sol.push_back((*it).second);
+//        cout << "(" << (*it).first << ", " << (*it).second << ")" << endl;
+    }
+    return init_sol;
+}
+
+Solution getBestSubset(int size, int job, vector<int> start, PfspInstance instance) {
+    vector<int> subset = start;
+
+    Solution best_subset = {vector<int>(0), static_cast<long>(10000000000)};
+    for (int i = 0; i < size; i++){
+        auto it = subset.begin();
+        it = subset.insert ( it+i, job ); // insert job to position i
+        int temp_wct = instance.computeWCT(subset);
+//        printVector(subset, "subset : ");
+//        cout << "=> " << temp_wct << endl;
+
+        if (temp_wct <= best_subset.wct) {
+            best_subset.sol = subset;
+            best_subset.wct = temp_wct;
+        }
+        if (i < subset.size()) {
+            subset.erase(subset.begin()+i); // remove the ith element of the list
+        }
+    }
+    return best_subset;
+}
+
+Solution simplifiedRZheuristic(PfspInstance instance) {
+    /*
+    Start by ordering the jobs in ascending order of their weighted sum of processing times
+	Then, construct the solution by inserting one job at a time in the position that minimize the WCT
+    */
+    vector<int> starting_sequence = getInitSRZsol(instance);
+//    printVector(starting_sequence, "starting sequence : ");
+    Solution best_sol = {vector<int>(0), static_cast<long>(10000000000)};
+    for (int j = 0; j < instance.getNbJob(); j++) {
+        Solution best_subset = getBestSubset(j+1, starting_sequence[j], best_sol.sol, instance);
+//        printSol(best_subset);
+        best_sol.sol = best_subset.sol;
+        best_sol.wct = best_subset.wct;
+    }
+    return best_sol;
+
+}

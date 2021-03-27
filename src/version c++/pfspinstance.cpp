@@ -32,14 +32,9 @@
 
 using namespace std;
 
-PfspInstance::PfspInstance()
-{
-}
+PfspInstance::PfspInstance() {}
 
-
-PfspInstance::~PfspInstance()
-{
-}
+PfspInstance::~PfspInstance() {}
 
 int PfspInstance::getNbJob() {
     return nb_jobs;
@@ -101,29 +96,21 @@ bool PfspInstance::readDataFromFile(char* fileName) {
     fileIn.open(fileName);
 
     if ( fileIn.is_open() ) {
-        cout << "File " << fileName << " is now open, start to read..." << std::endl;
-
         fileIn >> nb_jobs;
-        cout << "Number of jobs : " << nb_jobs << std::endl;
         fileIn >> nb_mach;
-        cout << "Number of machines : " << nb_mach << std::endl;
-        cout << "Allow memory for the matrix..." << std::endl;
+        cout << "Nb jobs : " << nb_jobs << ", nb mach : " << nb_mach << endl;
         allowMatrixMemory(nb_jobs, nb_mach);
-        cout << "Memory allowed." << std::endl;
-        cout << "Start to read matrix..." << std::endl;
 
         for (j = 0; j < nb_jobs; ++j) {
             for (m = 0; m < nb_mach; ++m) {
                 fileIn >> readValue; // The number of each machine, not important !
                 fileIn >> readValue; // Process Time
-
                 processing_times[j][m] = readValue;
             }
         }
         fileIn >> str; // this is not read
 
-        for (j = 0; j < nb_jobs; ++j)
-        {
+        for (j = 0; j < nb_jobs; ++j) {
             fileIn >> readValue; // -1
             fileIn >> readValue;
             dueDates[j] = readValue;
@@ -148,12 +135,32 @@ bool PfspInstance::readDataFromFile(char* fileName) {
 void PfspInstance::WCTfirstMach(vector<long int> & prev_mach_endtimes, vector< int > & sol) {
     /* 1st machine : */
     prev_mach_endtimes[0] = 0;
-    for ( int j = 0; j < nb_jobs; ++j ) {
+    for ( int j = 0; j < sol.size(); ++j ) {
         int job_nb = sol[j];
         int prev = 0;
         if (j-1 > -1)
             prev = prev_mach_endtimes[j-1];
         prev_mach_endtimes[j] = prev + processing_times[job_nb][0];
+    }
+}
+
+void PfspInstance::WCTotherMath(vector<long int> & prev_mach_endtimes, long int &prev_job_endtime, vector< int > & sol) {
+    int job_nb;
+    for (int m = 1; m < nb_mach; ++m ) {
+        prev_mach_endtimes[0] += processing_times[sol[0]][m];
+        prev_job_endtime = prev_mach_endtimes[0];
+
+        for ( int j = 1; j < sol.size(); ++j ) {
+            job_nb = sol[j];
+
+            if ( prev_mach_endtimes[j] > prev_job_endtime ) {
+                prev_mach_endtimes[j] = prev_mach_endtimes[j] + processing_times[job_nb][m];
+                prev_job_endtime = prev_mach_endtimes[j];
+            } else {
+                prev_job_endtime += processing_times[job_nb][m];
+                prev_mach_endtimes[j] = prev_job_endtime;
+            }
+        }
     }
 }
 
@@ -170,37 +177,23 @@ long int PfspInstance::computeWCT(vector< int > & sol)
     long int prev_job_endtime;
 
     /* 1st machine : */
-    prev_mach_endtimes[0] = 0;
-    for ( j = 0; j < nb_jobs; ++j ) {
-        job_nb = sol[j];
-        int prev = 0;
-        if (j-1 > -1)
-            prev = prev_mach_endtimes[j-1];
-        prev_mach_endtimes[j] = prev + processing_times[job_nb][0];
-    }
-    // WCTfirstMach(prev_mach_endtimes, sol);
+    WCTfirstMach(prev_mach_endtimes, sol);
 
     /* others machines : */
-    for ( m = 1; m < nb_mach; ++m ) {
-        prev_mach_endtimes[0] += processing_times[sol[0]][m];
-        prev_job_endtime = prev_mach_endtimes[0];
-
-        for ( j = 1; j < nb_jobs; ++j ) {
-            job_nb = sol[j];
-
-            if ( prev_mach_endtimes[j] > prev_job_endtime ) {
-                prev_mach_endtimes[j] = prev_mach_endtimes[j] + processing_times[job_nb][m];
-                prev_job_endtime = prev_mach_endtimes[j];
-            } else {
-                prev_job_endtime += processing_times[job_nb][m];
-                prev_mach_endtimes[j] = prev_job_endtime;
-            }
-        }
-    }
+    WCTotherMath(prev_mach_endtimes, prev_job_endtime, sol);
 
     wct = 0;
-    for ( j = 0; j < nb_jobs; ++j )
+    for ( j = 0; j < sol.size(); ++j )
         wct += prev_mach_endtimes[j] * weights[sol[j]];
 
     return wct;
+}
+
+/* Computes the weighted sum of processing times of job Ji */
+double PfspInstance::weightedSumSingleJob(int job) {
+    double ws = 0;
+    for (int j = 0; j < nb_mach; j++) {
+        ws += processing_times[job][j] / (double) weights[job];
+    }
+    return ws;
 }
