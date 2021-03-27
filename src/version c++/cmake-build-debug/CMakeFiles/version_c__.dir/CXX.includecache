@@ -32,18 +32,6 @@ string
 vector
 -
 
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/main.cpp
-iostream
--
-cstdlib
--
-ctime
--
-pfspinstance.h
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
-flowshop.h
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
-
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 string
 -

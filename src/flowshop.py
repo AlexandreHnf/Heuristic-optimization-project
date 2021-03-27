@@ -266,7 +266,7 @@ def averageRelativePercentageDev(deltas):
 	algorithm k = a combination of different mode
 		for example : --random --firstImprovement --tranpose
 	"""
-	return sum(delta) / len(delta) 
+	return sum(deltas) / len(deltas)
 
 
 def readBestKnownWCT(filename):

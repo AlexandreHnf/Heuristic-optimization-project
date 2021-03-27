@@ -6,6 +6,23 @@
 
 using namespace std;
 
+void testNeighbourBestImprovement(PfspInstance instance, Solution sol) {
+    cout << "--------------------------------" << endl;
+    cout << "BEST IMPROVEMENT NEIGHBOURHOODS" << endl;
+
+    cout << "transpose : " << endl;
+    Solution st = getBestTransposeNeighbour(sol, instance, "BI");
+    printSol(st);
+
+    cout << "exchange : " << endl;
+    Solution se = getBestExchangeNeighbour(sol, instance, "BI");
+    printSol(se);
+
+    cout << "insertion : " << endl;
+    Solution si = getBestInsertionNeighbour(sol, instance, "BI");
+    printSol(si);
+}
+
 void testSmallInstance() {
     cout << "========= TEST small instance =================================" << endl;
     PfspInstance small_instance;
@@ -22,6 +39,9 @@ void testSmallInstance() {
 
     Solution srz_sol = simplifiedRZheuristic(small_instance);
     printSol(srz_sol);
+
+    Solution s = {sol, wct};
+    testNeighbourBestImprovement(small_instance, s);
 }
 
 void testInstance1() {

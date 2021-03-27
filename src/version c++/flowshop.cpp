@@ -115,3 +115,120 @@ Solution simplifiedRZheuristic(PfspInstance instance) {
     return best_sol;
 
 }
+
+Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule) {
+    /*
+    Two permutations ø, ø' are transpose neighbours if, and only if,
+	one can be obtained from the other by swapping the positions of two adjacent jobs
+	ex : [A,B,C,D,E,F]
+	=>   [A,C,B,D,E,F]
+    */
+    Solution best_sol = {vector<int>(0), sol.wct};
+
+    for (int i = 0; i < sol.sol.size()-1; i++) {
+        vector<int> temp_sol = sol.sol;
+        iter_swap(temp_sol.begin() + i, temp_sol.begin() + i+1);
+        printVector(temp_sol, "");
+        int wct = instance.computeWCT(temp_sol);
+        if (wct < best_sol.wct) {
+            best_sol.sol = temp_sol;
+            best_sol.wct = wct;
+            if (pivoting_rule == "FI") {
+                return best_sol;
+            }
+        }
+    }
+    return best_sol;
+
+}
+
+Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule) {
+    /*
+    Two permutations ø, ø' are 2-exchange neighbours if, and only if,
+    one can be obtained from the other by exchanging two jobs at arbitrary positions
+    ex : [A,B,C,D,E,F]
+    =>   [A,E,C,D,B,F]
+    */
+    Solution best_sol = {vector<int>(0), sol.wct};
+
+    for (int i = 0; i < sol.sol.size(); i++) {
+        for (int j = 0; j < sol.sol.size(); j++) {
+            if (i != j) {
+                vector<int> temp_sol = sol.sol;
+                iter_swap(temp_sol.begin() + i, temp_sol.begin() + j);
+                printVector(temp_sol, "");
+                int wct = instance.computeWCT(temp_sol);
+                if (wct < best_sol.wct) {
+                    best_sol.sol = temp_sol;
+                    best_sol.wct = wct;
+                    if (pivoting_rule == "FI") {
+                        return best_sol;
+                    }
+                }
+            }
+        }
+    }
+    return best_sol;
+}
+
+Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string pivoting_rule) {
+    /*
+    Two permutations ø, ø' are insertion neighbours if, and only if,
+    one can be obtained from the other by removing a job from one position
+                                                                  and inserting it at another position
+    ex : [A,B,C,D,E,F]
+                 =>   [A,C,D,B,E,F]
+
+    QUESTION : l'insertion peuut se faire en fin de liste aussi ?
+    */
+    Solution best_sol = {vector<int>(0), sol.wct};
+
+    for (int i = 0; i < sol.sol.size(); i++) {
+        for (int j = 0; j < sol.sol.size() + 1; j++) {
+            if (i != j and j != i+1) {
+                vector<int> temp_sol = sol.sol;
+                auto it = temp_sol.begin();
+                it = temp_sol.insert ( it+j, sol.sol[i] ); // insert job to position j
+                if (j < i) {
+                    temp_sol.erase(temp_sol.begin()+i+1); // remove the (i+1)th element of the list
+                } else {
+                    temp_sol.erase(temp_sol.begin()+i); // remove the ith element of the list
+                }
+                printVector(temp_sol, "");
+                int wct = instance.computeWCT(temp_sol);
+                if (wct < best_sol.wct) {
+                    best_sol.sol = temp_sol;
+                    best_sol.wct = wct;
+                    if (pivoting_rule == "FI") {
+                        return best_sol;
+                    }
+                }
+            }
+        }
+    }
+    return best_sol;
+}
+
+// ITERATIVE IMPROVEMENT
+bool isLocalOptimal(Solution sol) {
+
+}
+
+Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_type, string pivoting_rule) {
+    if (neighbour_type == "T") {
+        return getBestTransposeNeighbour(sol, instance, pivoting_rule);
+    } else if (neighbour_type == "E") {
+        return getBestExchangeNeighbour(sol, instance, pivoting_rule);
+    } else {
+        return getBestInsertionNeighbour(sol, instance, pivoting_rule);
+    }
+}
+
+Solution iterativeImprovement(vector<string> args, PfspInstance instance) {
+
+}
+
+// VND : variable neighbourhood descent
+Solution variableNeighbourhoodDescent(string initSolRule, vector<string> neighbourhoods, PfspInstance instance) {
+
+}
