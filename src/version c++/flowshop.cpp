@@ -43,23 +43,31 @@ void printVector(vector<int> v, string message) {
 }
 
 void printSol(Solution s) {
-    cout << "-----" << endl;
     printVector(s.sol, "jobs : ");
     cout << "wct : " << s.wct << endl;
 }
 
-std::vector<int> generateRndSol(int nbJ) {
-    std::vector<int> sol(nbJ);
-    for (int i=0; i<nbJ; i++) {
+/***************************************************************************/
+
+Solution generateRndSol(PfspInstance instance) {
+    /*
+    Fill the solution with numbers between 0 and nb_jobs, shuffled
+    */
+    std::vector<int> sol(instance.getNbJob());
+    for (int i=0; i<instance.getNbJob(); i++) {
         sol[i] = i;
     }
     random_shuffle(sol.begin(), sol.end());
-    return sol;
+    Solution random_sol = {sol, instance.computeWCT(sol)};
+    return random_sol;
 }
 
-/***********************************************************************/
 
 vector<int> getInitSRZsol(PfspInstance instance) {
+    /*
+    Get the set of jobs ordered (ascending) according to their
+    weighted sum of processing times
+    */
     multimap<double, int > mymap; // sorted map in ascending order of the keys
 
     for (int i = 0; i < instance.getNbJob(); i++) {
@@ -116,6 +124,8 @@ Solution simplifiedRZheuristic(PfspInstance instance) {
 
 }
 
+/***************************************************************************/
+
 Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule) {
     /*
     Two permutations ø, ø' are transpose neighbours if, and only if,
@@ -128,7 +138,7 @@ Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string p
     for (int i = 0; i < sol.sol.size()-1; i++) {
         vector<int> temp_sol = sol.sol;
         iter_swap(temp_sol.begin() + i, temp_sol.begin() + i+1);
-        printVector(temp_sol, "");
+//        printVector(temp_sol, "");
         int wct = instance.computeWCT(temp_sol);
         if (wct < best_sol.wct) {
             best_sol.sol = temp_sol;
@@ -156,7 +166,7 @@ Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pi
             if (i != j) {
                 vector<int> temp_sol = sol.sol;
                 iter_swap(temp_sol.begin() + i, temp_sol.begin() + j);
-                printVector(temp_sol, "");
+//                printVector(temp_sol, "");
                 int wct = instance.computeWCT(temp_sol);
                 if (wct < best_sol.wct) {
                     best_sol.sol = temp_sol;
@@ -194,7 +204,7 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
                 } else {
                     temp_sol.erase(temp_sol.begin()+i); // remove the ith element of the list
                 }
-                printVector(temp_sol, "");
+//                printVector(temp_sol, "");
                 int wct = instance.computeWCT(temp_sol);
                 if (wct < best_sol.wct) {
                     best_sol.sol = temp_sol;
@@ -209,26 +219,79 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
     return best_sol;
 }
 
+/***************************************************************************/
+
+
 // ITERATIVE IMPROVEMENT
 bool isLocalOptimal(Solution sol) {
+    /*
+    Check if the solution is a local optimum. By definition, a local optimum (here minimum) is :
+    search position without improving neighbours w.r.t. given evaluation function g and neighbourhood
+    N. i.e. position s in S such that g(s) <= g(s') for all s' of N(s).
+    => same as checking if the neighbour found is empty. (if empty : sol is a local optimum)
+    */
+    return (sol.sol.empty()); // if true => local optimum
+}
 
+Solution generateInitialSolution(string mode, PfspInstance instance) {
+    if (mode == "R") {
+        return generateRndSol(instance);
+    } else if (mode == "SRZ") {
+        return simplifiedRZheuristic(instance);
+    }
 }
 
 Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_type, string pivoting_rule) {
+    /*
+    Choose one neighbour (the best one) among all the neighbours of a given solution.
+    */
     if (neighbour_type == "T") {
         return getBestTransposeNeighbour(sol, instance, pivoting_rule);
     } else if (neighbour_type == "E") {
         return getBestExchangeNeighbour(sol, instance, pivoting_rule);
-    } else {
+    } else if (neighbour_type == "I"){
         return getBestInsertionNeighbour(sol, instance, pivoting_rule);
     }
 }
 
-Solution iterativeImprovement(vector<string> args, PfspInstance instance) {
-
+Solution iterativeImprovement(string pivoting_rule, string neigh_rule, PfspInstance instance, Solution init_sol) {
+    /*
+    Heuristic algorithm to find the optimal solution to the PSFP
+    args = [pivotingrule, neighbourhood]
+    */
+    Solution best_sol = init_sol;
+    Solution neighbour = chooseNeighbour(best_sol, instance, neigh_rule, pivoting_rule);
+    int it = 0;
+    while (!isLocalOptimal(neighbour)) {
+        best_sol = neighbour;
+        neighbour = chooseNeighbour(best_sol, instance, neigh_rule, pivoting_rule);
+        it++;
+    }
+    return best_sol;
 }
 
 // VND : variable neighbourhood descent
-Solution variableNeighbourhoodDescent(string initSolRule, vector<string> neighbourhoods, PfspInstance instance) {
-
+Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspInstance instance, Solution init_sol) {
+    /*
+    VND variable neighbourhood descent
+    use different neighbourhood mode throughout the algorithm
+    args = [name.py, initsol, pivotingrule, neighbourhood]
+    */
+    int i = 0;
+    int it = 0;
+    Solution best_sol = init_sol;
+    while (i > neighbourhood_modes.size()) {
+        cout << "neighbourhood mode : " << neighbourhood_modes[i] << endl;
+        Solution neighbour = chooseNeighbour(best_sol, instance, neighbourhood_modes[i], "FI");
+        if (isLocalOptimal(neighbour)) { // if no existing improving solution
+            i++;
+        } else {
+            best_sol = neighbour;
+            cout << "it " << it << " | ";
+//            printSol(best_sol);
+            i = 0;
+            it++;
+        }    
+    }
+    return best_sol;
 }

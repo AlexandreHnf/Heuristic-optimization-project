@@ -17,11 +17,10 @@ void printVector(vector<int>, string);
 void printSol(Solution s);
 
 // INITIAL SOLUTION GENERATION
-std::vector<int> generateRndSol(int nbJobs);
+Solution generateRndSol(PfspInstance instance);
 vector<int> getInitSRZsol(PfspInstance instance);
 Solution getBestSubset(int size, int job, vector<int> start, PfspInstance instance);
 Solution simplifiedRZheuristic(PfspInstance instance);
-Solution generateInitialSolution(string mode, PfspInstance instance);
 
 // NEIGHBOUR SOLUTIONS GENERATION
 Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule);
@@ -30,11 +29,12 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
 
 // ITERATIVE IMPROVEMENT
 bool isLocalOptimal(Solution sol);
+Solution generateInitialSolution(string mode, PfspInstance instance);
 Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_type, string pivoting_rule);
-Solution iterativeImprovement(vector<string> args, PfspInstance instance);
+Solution iterativeImprovement(string pivoting_rule, string neigh_rule, PfspInstance instance, Solution init_sol);
 
 // VND : variable neighbourhood descent
-Solution variableNeighbourhoodDescent(string initSolRule, vector<string> neighbourhoods, PfspInstance instance);
+Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspInstance instance, Solution init_sol);
 
 // For tests
 //double averageRelativePercentageDev()
