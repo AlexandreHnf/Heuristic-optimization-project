@@ -325,12 +325,12 @@ vector<vInt> readBestSolFromFile(basic_string<char> filename) {
     string str;
     ifstream fileIn;
 
-    vector<vInt> best_solutions = {vInt(), vInt()};
+    vector<vInt> best_solutions = {vInt(), vInt()}; // 50 jobs then 100 jobs
 
     fileIn.open(filename);
     if ( fileIn.is_open() ) {
         fileIn >> str; fileIn >> str; fileIn >> str; // "Problem , BS" => skip first line
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i >= 0; i--) {
             for (int j = 0; j < 30; ++j) {
                 fileIn >> str; // The instance name, not important !
                 fileIn >> str; // "," not important

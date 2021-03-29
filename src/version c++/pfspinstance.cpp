@@ -79,7 +79,7 @@ bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
     string str;
     ifstream fileIn;
 
-    cout << "file : " << fileName << endl;
+//    cout << "file : " << fileName << endl;
 
     fileIn.open(fileName);
 

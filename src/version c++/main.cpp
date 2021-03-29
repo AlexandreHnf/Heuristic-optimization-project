@@ -91,7 +91,7 @@ void testAllAlgos(PfspInstance instance, vdouble &computation_times, vdouble &RP
                 auto start_alg_time = chrono::steady_clock::now();
                 solution = iterativeImprovement(pivoting_rules[p], neigh_modes[n], instance, init_sols[s]);
                 cout << "ALGO " << init_rules[s] << "-" << pivoting_rules[p] << "-" << neigh_modes[n] << ": " << endl;
-                printSol(solution);
+//                printSol(solution);
                 auto end_alg_time = chrono::steady_clock::now();
                 computation_times[algo_id] = chrono::duration <double> (end_alg_time-start_alg_time).count();
                 RPD[algo_id] = relativePercentageDeviation(solution.wct, best_known);
@@ -103,6 +103,7 @@ void testAllAlgos(PfspInstance instance, vdouble &computation_times, vdouble &RP
     }
     auto end = chrono::steady_clock::now();
     cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
+    cout << "====================================" << endl;
 }
 
 void testVNDall(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known) {
@@ -139,8 +140,61 @@ void testVNDall(PfspInstance instance, vdouble &computation_times, vdouble &RPD,
     cout << "4 VND Done in " << timing << "sec" << endl;
 }
 
-void testAllInstances() {
+string getInstanceName(int i, int j) {
+    // i = represent wheter it is a instance with 50 or 100 jobs
+    // j = the instance number
+    string instance_name = "";
+    if (i == 0) {
+        instance_name += "50_20_";
+    } else {
+        instance_name += "100_20_";
+    }
+    string instance_nb = "";
+    if (j < 10) {
+        instance_nb = "0" + to_string(j);
+    } else {
+        instance_nb += to_string(j);
+    }
+    return instance_name + instance_nb;
+}
 
+void IItestAllInstances(vector<vector<int>> best_knowns) {
+    /*
+    Run the 12 algos on each instance
+     => 12 algos on 30 instances of 50 jobs and then on 30 instances of 100 jobs
+     TODO : srand ( time(NULL) ); for each instance
+    */
+    vdouble avg_CTs(12);
+    vdouble avg_RPDs(12);
+    string base_filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\";
+    string instance_name;
+
+    // all instances with 50 and then 100 jobs :
+    // TODO mettre i < 2 pour avoir les instances 100
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < 30; j++) {
+            instance_name = getInstanceName(i, j + 1);
+            string inst_filename = base_filenameW + instance_name;
+            cout << "Instance " << instance_name << ": " << endl;
+            PfspInstance instance;
+            if (!instance.readDataFromFile(inst_filename))
+                return;
+
+            vdouble computation_times(12);
+            vdouble RPD(12);
+            testAllAlgos(instance, computation_times, RPD, best_knowns[i][j]);
+            for (int k = 0; k < 12; k++) {
+                avg_CTs[k] += computation_times[k];
+                avg_RPDs[k] += RPD[k];
+//                cout << "Computing times : " << computation_times << endl;
+//                cout << "Relative percentage deviations : " << RPD << endl;
+            }
+        }
+    }
+    // TODO : diviser les sommmes par le nombre d'élements pour avoir l'avg
+    cout << "END ========================= " << endl;
+    cout << "average CT : " << avg_CTs << endl;
+    cout << "average RPD : " << avg_RPDs << endl;
 }
 
 /***************************************************************************/
@@ -176,7 +230,6 @@ void testSmallInstance() {
 void testMediumInstance(vector<vector<int>> best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
-    string bestSolutionsFileW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\50_20_01";
 
     /* Create instance object */
@@ -208,7 +261,6 @@ void testMediumInstance(vector<vector<int>> best_knowns) {
 
 void testBigInstance(vector<vector<int>> best_knowns) {
     cout << "=============== TEST instance BIG (100) ================" << endl;
-//    char *filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
     string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
 
     /* Create instance object */
@@ -243,8 +295,6 @@ void testBigInstance(vector<vector<int>> best_knowns) {
 
 int main(int argc, char *argv[])
 {
-    int i;
-    long int WeightedSumCompletionTimes;
 
 //    if (argc == 1) {
 //        cout << "Usage: ./flowshopWCT <instance_file>" << endl;
@@ -262,16 +312,17 @@ int main(int argc, char *argv[])
     srand ( time(NULL) );
     // srand(0);
 
-//    char *filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     vector<vector<int>> best_knowns =  readBestSolFromFile(filenameBestSols);
+//    cout << best_knowns << endl;
 
 //    testSmallInstance();
 
-    testMediumInstance(best_knowns);
-
+//    testMediumInstance(best_knowns);
+//
 //    testBigInstance(best_knowns);
 
+    IItestAllInstances(best_knowns);
 
     return 0;
 }
