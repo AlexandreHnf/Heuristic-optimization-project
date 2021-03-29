@@ -29,7 +29,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 
 class PfspInstance{
     private:
@@ -62,12 +61,12 @@ class PfspInstance{
         void setPriority(int job, int value);
 
         /* Read Data from a file : */
-        bool readDataFromFile(basic_string<char> fileName);
+        bool readDataFromFile(std::basic_string<char> fileName);
 
 
-        void WCTfirstMach(vector<long int> & prev_mach_endtimes, vector< int > & sol);
-        void WCTotherMath(vector<long int> & prev_mach_endtimes, long int &prev_job_endtime, vector< int > & sol);
-        long int computeWCT (vector< int > & sol);
+        void WCTfirstMach(std::vector<long int> & prev_mach_endtimes, std::vector< int > & sol);
+        void WCTotherMath(std::vector<long int> & prev_mach_endtimes, long int &prev_job_endtime, std::vector< int > & sol);
+        long int computeWCT (std::vector< int > & sol);
 
         double weightedSumSingleJob(int job);
 };

@@ -10,35 +10,35 @@
 
 struct Solution
 {
-    vector<int> sol;
+    std::vector<int> sol;
     long int wct;
 };
-void printVector(vector<int>, string);
+void printVector(std::vector<int>, std::string);
 void printSol(Solution s);
 
 // INITIAL SOLUTION GENERATION
 Solution generateRndSol(PfspInstance instance);
-vector<int> getInitSRZsol(PfspInstance instance);
-Solution getBestSubset(int size, int job, vector<int> start, PfspInstance instance);
+std::vector<int> getInitSRZsol(PfspInstance instance);
+Solution getBestSubset(int size, int job, std::vector<int> start, PfspInstance instance);
 Solution simplifiedRZheuristic(PfspInstance instance);
 
 // NEIGHBOUR SOLUTIONS GENERATION
-Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule);
-Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pivoting_rule);
-Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string pivoting_rule);
+Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, std::string pivoting_rule);
+Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, std::string pivoting_rule);
+Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, std::string pivoting_rule);
 
 // ITERATIVE IMPROVEMENT
 bool isLocalOptimal(Solution sol);
-Solution generateInitialSolution(string mode, PfspInstance instance);
-Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_type, string pivoting_rule);
-Solution iterativeImprovement(string pivoting_rule, string neigh_rule, PfspInstance instance, Solution init_sol);
+Solution generateInitialSolution(std::string mode, PfspInstance instance);
+Solution chooseNeighbour(Solution sol, PfspInstance instance, std::string neighbour_type, std::string pivoting_rule);
+Solution iterativeImprovement(std::string pivoting_rule, std::string neigh_rule, PfspInstance instance, Solution init_sol);
 
 // VND : variable neighbourhood descent
-Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspInstance instance, Solution init_sol);
+Solution variableNeighbourhoodDescent(std::vector<std::string> neighbourhood_modes, PfspInstance instance, Solution init_sol);
 
 // For tests
 //double averageRelativePercentageDev()
 
-vector<vector<int>> readBestSolFromFile(basic_string<char> filename);
+std::vector<std::vector<int>> readBestSolFromFile(std::basic_string<char> filename);
 
 #endif //VERSION_C___FLOWSHOP_H

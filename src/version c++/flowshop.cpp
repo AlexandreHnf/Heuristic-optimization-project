@@ -33,8 +33,10 @@
 #include "flowshop.h"
 
 using namespace std;
+typedef vector<int> vInt;
 
-void printVector(vector<int> v, string message) {
+
+void printVector(vInt v, string message) {
     cout << message;
     for (int i=0; i<v.size(); i++){
         cout << v[i] << " ";
@@ -42,8 +44,18 @@ void printVector(vector<int> v, string message) {
     cout << endl;
 }
 
+template <typename T>
+std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
+{
+    for(auto elem : vec) {
+        os << elem << ", ";
+    }
+    return os;
+}
+
 void printSol(Solution s) {
-    printVector(s.sol, "jobs : ");
+//    printVector(s.sol, "jobs : ");
+    cout << s.sol << endl;
     cout << "wct : " << s.wct << endl;
 }
 
@@ -53,7 +65,7 @@ Solution generateRndSol(PfspInstance instance) {
     /*
     Fill the solution with numbers between 0 and nb_jobs, shuffled
     */
-    std::vector<int> sol(instance.getNbJob());
+    vInt sol(instance.getNbJob());
     for (int i=0; i<instance.getNbJob(); i++) {
         sol[i] = i;
     }
@@ -63,7 +75,7 @@ Solution generateRndSol(PfspInstance instance) {
 }
 
 
-vector<int> getInitSRZsol(PfspInstance instance) {
+vInt getInitSRZsol(PfspInstance instance) {
     /*
     Get the set of jobs ordered (ascending) according to their
     weighted sum of processing times
@@ -74,7 +86,7 @@ vector<int> getInitSRZsol(PfspInstance instance) {
         mymap.insert(make_pair(instance.weightedSumSingleJob(i), i));
     }
 
-    vector<int> init_sol(0);
+    vInt init_sol(0);
     // begin() returns to the first value of multimap.
     multimap<double,int> :: iterator it;
     for (it = mymap.begin() ; it != mymap.end() ; it++) {
@@ -84,10 +96,10 @@ vector<int> getInitSRZsol(PfspInstance instance) {
     return init_sol;
 }
 
-Solution getBestSubset(int size, int job, vector<int> start, PfspInstance instance) {
-    vector<int> subset = start;
+Solution getBestSubset(int size, int job, vInt start, PfspInstance instance) {
+    vInt subset = start;
 
-    Solution best_subset = {vector<int>(0), static_cast<long>(10000000000)};
+    Solution best_subset = {vInt(0), static_cast<long>(10000000000)};
     for (int i = 0; i < size; i++){
         auto it = subset.begin();
         it = subset.insert ( it+i, job ); // insert job to position i
@@ -111,9 +123,9 @@ Solution simplifiedRZheuristic(PfspInstance instance) {
     Start by ordering the jobs in ascending order of their weighted sum of processing times
 	Then, construct the solution by inserting one job at a time in the position that minimize the WCT
     */
-    vector<int> starting_sequence = getInitSRZsol(instance);
+    vInt starting_sequence = getInitSRZsol(instance);
 //    printVector(starting_sequence, "starting sequence : ");
-    Solution best_sol = {vector<int>(0), static_cast<long>(10000000000)};
+    Solution best_sol = {vInt(0), static_cast<long>(10000000000)};
     for (int j = 0; j < instance.getNbJob(); j++) {
         Solution best_subset = getBestSubset(j+1, starting_sequence[j], best_sol.sol, instance);
 //        printSol(best_subset);
@@ -133,8 +145,8 @@ Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string p
 	ex : [A,B,C,D,E,F]
 	=>   [A,C,B,D,E,F]
     */
-    Solution best_sol = {vector<int>(0), sol.wct};
-    vector<int> temp_sol;
+    Solution best_sol = {vInt(0), sol.wct};
+    vInt temp_sol;
 
     for (int i = 0; i < sol.sol.size()-1; i++) {
         temp_sol = sol.sol;
@@ -160,8 +172,8 @@ Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pi
     ex : [A,B,C,D,E,F]
     =>   [A,E,C,D,B,F]
     */
-    Solution best_sol = {vector<int>(0), sol.wct};
-    vector<int> temp_sol;
+    Solution best_sol = {vInt(0), sol.wct};
+    vInt temp_sol;
 
     for (int i = 0; i < sol.sol.size(); i++) {
         for (int j = 0; j < sol.sol.size(); j++) {
@@ -193,8 +205,8 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
 
     QUESTION : l'insertion peuut se faire en fin de liste aussi ?
     */
-    Solution best_sol = {vector<int>(0), sol.wct};
-    vector<int> temp_sol;
+    Solution best_sol = {vInt(0), sol.wct};
+    vInt temp_sol;
 
     for (int i = 0; i < sol.sol.size(); i++) {
         for (int j = 0; j < sol.sol.size() + 1; j++) {
@@ -242,7 +254,7 @@ Solution generateInitialSolution(string mode, PfspInstance instance) {
     } else if (mode == "SRZ") {
         return simplifiedRZheuristic(instance);
     } else {
-        return {vector<int>(0), 0}; // just to avoid warning, will never happen
+        return {vInt(0), 0}; // just to avoid warning, will never happen
     }
 }
 
@@ -257,7 +269,7 @@ Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_t
     } else if (neighbour_type == "I"){
         return getBestInsertionNeighbour(sol, instance, pivoting_rule);
     } else {
-        return {vector<int>(0), 0}; // just to avoid warning, will never happen
+        return {vInt(0), 0}; // just to avoid warning, will never happen
     }
 }
 
@@ -305,7 +317,7 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
     return best_sol;
 }
 
-vector<vector<int>> readBestSolFromFile(basic_string<char> filename) {
+vector<vInt> readBestSolFromFile(basic_string<char> filename) {
     // TODO : must be working on ubuntu and windows with relative path
 
     bool everythingOK = true;
@@ -313,7 +325,7 @@ vector<vector<int>> readBestSolFromFile(basic_string<char> filename) {
     string str;
     ifstream fileIn;
 
-    vector<vector<int>> best_solutions = {vector<int>(), vector<int>()};
+    vector<vInt> best_solutions = {vInt(), vInt()};
 
     fileIn.open(filename);
     if ( fileIn.is_open() ) {

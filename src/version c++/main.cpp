@@ -6,6 +6,17 @@
 #include "flowshop.h"
 
 using namespace std;
+typedef vector<double> vdouble;
+
+template <typename T>
+std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
+{
+    for(auto elem : vec) {
+        os << elem << ", ";
+    }
+    return os;
+}
+
 
 void testNeighbourBestImprovement(PfspInstance instance, Solution sol) {
     cout << "--------------------------------" << endl;
@@ -42,18 +53,17 @@ void testNeighbourFirstImprovement(PfspInstance instance, Solution sol) {
 }
 
 /***************************************************************************/
-void runAllmodes(PfspInstance instance, Solution start_sol, string init_rule, vector<string> piv_rules, vector<string> neigh_modes) {
-    Solution solution;
-    for (int p = 0; p < 2; p++) {
-        for (int n = 0; n < 3; n++) {
-            solution = iterativeImprovement(piv_rules[p], neigh_modes[n], instance, start_sol);
-            cout << "ALGO " << init_rule << "-" << piv_rules[p] << "-" << neigh_modes[n] << endl;
-            printSol(solution);
-        }
-    }
+
+double relativePercentageDeviation(int wct, int best_known) {
+    /*
+    Computes the relative percentage deviation of the algorithm k on the instance i
+    algorithm k = a combination of different mode
+    for example : --random --firstImprovement --tranpose
+    */
+    return 100 * (((double) wct - (double) best_known) / (double) best_known);
 }
 
-void testAllAlgos(PfspInstance instance) {
+void testAllAlgos(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known) {
     /*
     1)  R - FI - T          7)  S - FI - T
     2)  R - FI - E          8)  S - FI - E
@@ -78,10 +88,16 @@ void testAllAlgos(PfspInstance instance) {
     for (int s = 0; s < 2; s++) {
         for (int p = 0; p < 2; p++) {
             for (int n = 0; n < 3; n++) {
+                auto start_alg_time = chrono::steady_clock::now();
                 solution = iterativeImprovement(pivoting_rules[p], neigh_modes[n], instance, init_sols[s]);
                 cout << "ALGO " << init_rules[s] << "-" << pivoting_rules[p] << "-" << neigh_modes[n] << ": " << endl;
                 printSol(solution);
+                auto end_alg_time = chrono::steady_clock::now();
+                computation_times[algo_id] = chrono::duration <double> (end_alg_time-start_alg_time).count();
+                RPD[algo_id] = relativePercentageDeviation(solution.wct, best_known);
+                cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
                 cout << "-------------------" << endl;
+                algo_id++;
             }
         }
     }
@@ -89,33 +105,38 @@ void testAllAlgos(PfspInstance instance) {
     cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
 }
 
-void testVNDall(PfspInstance instance) {
+void testVNDall(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known) {
     /*
      Test all combination of VND-PFSP on all instances
+     result = a relative percentage deviation per algo + computation time of each algo
+     on the given instance.
     */
     cout << "=== TEST ALL VND (4) ===" << endl;
-    vector<string> init_rules = {"R", "SRZ"};
-    vector<string> neigh_modes1 = {"T", "E", "I"};
-    vector<string> neigh_modes2 = {"T", "I", "E"};
-    vector<vector<string>> neigh_modes = {neigh_modes1, neigh_modes2};
+    vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"T", "E", "I"}, vector<string>{"T", "I", "E"}};
 
-    Solution start_sol_R = generateInitialSolution(init_rules[0], instance);
-    Solution start_sol_SRZ = generateInitialSolution(init_rules[1], instance);
+    Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
+    Solution start_sol_SRZ = generateInitialSolution(modes[0][1], instance);
     vector<Solution> init_sols = {start_sol_R, start_sol_SRZ};
     cout << "---------------------------" << endl;
     Solution solution;
 
     auto start = chrono::steady_clock::now();
     for (int s = 0; s < 2; s++) {
-        for (int n = 0; n < 2; n++) {
-            cout << "ALGO " << init_rules[s] << "-" << neigh_modes[n][0] << "-" <<
-                            neigh_modes[n][1] << "-" << neigh_modes[n][2] << endl;
-            solution = variableNeighbourhoodDescent(neigh_modes[n], instance, init_sols[s]);
+        for (int n = 1; n < 3; n++) {
+            auto start_alg_time = chrono::steady_clock::now();
+            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
+                            modes[n][1] << "-" << modes[n][2] << endl;
+            solution = variableNeighbourhoodDescent(modes[n], instance, init_sols[s]);
             printSol(solution);
+            auto end_alg_time = chrono::steady_clock::now();
+            computation_times[s*2+n-1] = chrono::duration <double> (end_alg_time-start_alg_time).count();
+            RPD[s*2+n-1] = relativePercentageDeviation(solution.wct, best_known);
+            cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
         }
     }
     auto end = chrono::steady_clock::now();
-    cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
+    double timing = chrono::duration <double> (end-start).count();
+    cout << "4 VND Done in " << timing << "sec" << endl;
 }
 
 void testAllInstances() {
@@ -144,12 +165,15 @@ void testSmallInstance() {
 //    Solution s = {sol, wct};
 //    testNeighbourBestImprovement(small_instance, s);
 
-    testAllAlgos(small_instance);
+    vdouble computation_times(12);
+    vdouble RPD(12);
+    testAllAlgos(small_instance, computation_times, RPD, 144);
     cout << "==================================" << endl;
-    testVNDall(small_instance);
+
+    testVNDall(small_instance, computation_times, RPD, 144);
 }
 
-void testMediumInstance() {
+void testMediumInstance(vector<vector<int>> best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
     string bestSolutionsFileW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
@@ -172,12 +196,17 @@ void testMediumInstance() {
     int wct = instance.computeWCT(random_solution.sol);
     cout << "WCT of random sol : " << wct << endl;
 
-//    testAllAlgos(instance);
+    vdouble computation_times(12);
+    vdouble RPD(12);
+    testAllAlgos(instance, computation_times, RPD, best_knowns[1][0]);
+
+    cout << "computation times : " << computation_times << endl;
+    cout << "relative percentage deviations : " << RPD << endl;
     cout << "==================================" << endl;
-    testVNDall(instance);
+//    testVNDall(instance);
 }
 
-void testBigInstance() {
+void testBigInstance(vector<vector<int>> best_knowns) {
     cout << "=============== TEST instance BIG (100) ================" << endl;
 //    char *filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
     string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
@@ -199,9 +228,11 @@ void testBigInstance() {
     int wct = instance.computeWCT(random_solution.sol);
     cout << "WCT of random sol : " << wct << endl;
 
-//    testAllAlgos(instance);
+    vdouble computation_times(12);
+    vdouble RPD(12);
+    testAllAlgos(instance, computation_times, RPD, best_knowns[0][0]);
     cout << "==================================" << endl;
-    testVNDall(instance);
+//    testVNDall(instance);
 }
 
 
@@ -233,13 +264,13 @@ int main(int argc, char *argv[])
 
 //    char *filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
-    vector<vector<int>> best_solutions =  readBestSolFromFile(filenameBestSols);
+    vector<vector<int>> best_knowns =  readBestSolFromFile(filenameBestSols);
 
 //    testSmallInstance();
 
-//    testMediumInstance();
+    testMediumInstance(best_knowns);
 
-//    testBigInstance();
+//    testBigInstance(best_knowns);
 
 
     return 0;
