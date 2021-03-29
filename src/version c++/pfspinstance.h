@@ -62,7 +62,7 @@ class PfspInstance{
         void setPriority(int job, int value);
 
         /* Read Data from a file : */
-        bool readDataFromFile(char * fileName);
+        bool readDataFromFile(basic_string<char> fileName);
 
 
         void WCTfirstMach(vector<long int> & prev_mach_endtimes, vector< int > & sol);

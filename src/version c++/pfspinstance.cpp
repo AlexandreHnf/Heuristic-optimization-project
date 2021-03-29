@@ -70,7 +70,7 @@ long int PfspInstance::getTime(int job, int machine)
 
 
 /* Read the instance from file : */
-bool PfspInstance::readDataFromFile(char* fileName) {
+bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
     // TODO : must be working on ubuntu and windows with relative path
 
     bool everythingOK = true;
@@ -78,19 +78,7 @@ bool PfspInstance::readDataFromFile(char* fileName) {
     long int readValue;
     string str;
     ifstream fileIn;
-    char * aux2;
-    char fileNameOK[100] = "";
 
-    aux2 = (strrchr(fileName, '\\')); // find last occurence of '/' in filename
-
-    if (aux2 == NULL)
-        aux2 = fileName;
-    else
-        aux2 += 1;
-
-    strcat(fileNameOK, aux2);
-
-    cout << "name : " << fileNameOK << endl;
     cout << "file : " << fileName << endl;
 
     fileIn.open(fileName);

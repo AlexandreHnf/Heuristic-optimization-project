@@ -128,7 +128,7 @@ void testSmallInstance() {
     cout << "========= TEST small instance =================================" << endl;
     PfspInstance small_instance;
 
-    char * filenameSmall = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\small instance\\05_03_01";
+    string filenameSmall = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\small instance\\05_03_01";
     if (! small_instance.readDataFromFile(filenameSmall) )
         return;
 
@@ -154,14 +154,13 @@ void testMediumInstance() {
 
     string bestSolutionsFileW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\50_20_01";
-    char *filenameW2 = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\50_20_01";
 
     /* Create instance object */
     PfspInstance instance;
 
     /* Read data from file */
 //    if (! instance.readDataFromFile(argv[1]) )
-    if (! instance.readDataFromFile(filenameW2) ) return;
+    if (! instance.readDataFromFile(filenameW) ) return;
 
     /* solution with initial random values */
     Solution random_solution = generateRndSol(instance);
@@ -180,7 +179,8 @@ void testMediumInstance() {
 
 void testBigInstance() {
     cout << "=============== TEST instance BIG (100) ================" << endl;
-    char *filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
+//    char *filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
+    string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\100_20_01";
 
     /* Create instance object */
     PfspInstance instance;
@@ -231,7 +231,8 @@ int main(int argc, char *argv[])
     srand ( time(NULL) );
     // srand(0);
 
-    char *filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
+//    char *filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
+    string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
     vector<vector<int>> best_solutions =  readBestSolFromFile(filenameBestSols);
 
 //    testSmallInstance();

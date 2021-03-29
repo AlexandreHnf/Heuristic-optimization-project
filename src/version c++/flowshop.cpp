@@ -241,6 +241,8 @@ Solution generateInitialSolution(string mode, PfspInstance instance) {
         return generateRndSol(instance);
     } else if (mode == "SRZ") {
         return simplifiedRZheuristic(instance);
+    } else {
+        return {vector<int>(0), 0}; // just to avoid warning, will never happen
     }
 }
 
@@ -254,6 +256,8 @@ Solution chooseNeighbour(Solution sol, PfspInstance instance, string neighbour_t
         return getBestExchangeNeighbour(sol, instance, pivoting_rule);
     } else if (neighbour_type == "I"){
         return getBestInsertionNeighbour(sol, instance, pivoting_rule);
+    } else {
+        return {vector<int>(0), 0}; // just to avoid warning, will never happen
     }
 }
 
@@ -301,7 +305,7 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
     return best_sol;
 }
 
-vector<vector<int>> readBestSolFromFile(char * filename) {
+vector<vector<int>> readBestSolFromFile(basic_string<char> filename) {
     // TODO : must be working on ubuntu and windows with relative path
 
     bool everythingOK = true;
@@ -312,7 +316,6 @@ vector<vector<int>> readBestSolFromFile(char * filename) {
     vector<vector<int>> best_solutions = {vector<int>(), vector<int>()};
 
     fileIn.open(filename);
-
     if ( fileIn.is_open() ) {
         fileIn >> str; fileIn >> str; fileIn >> str; // "Problem , BS" => skip first line
         for (int i = 0; i < 2; i++) {
@@ -320,7 +323,7 @@ vector<vector<int>> readBestSolFromFile(char * filename) {
                 fileIn >> str; // The instance name, not important !
                 fileIn >> str; // "," not important
                 fileIn >> wct; // best solution wct
-                cout << wct << endl;
+//                cout << wct << endl;
                 best_solutions[i].push_back( (int) wct);
             }
         }
