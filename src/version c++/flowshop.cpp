@@ -134,9 +134,10 @@ Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string p
 	=>   [A,C,B,D,E,F]
     */
     Solution best_sol = {vector<int>(0), sol.wct};
+    vector<int> temp_sol;
 
     for (int i = 0; i < sol.sol.size()-1; i++) {
-        vector<int> temp_sol = sol.sol;
+        temp_sol = sol.sol;
         iter_swap(temp_sol.begin() + i, temp_sol.begin() + i+1);
 //        printVector(temp_sol, "");
         int wct = instance.computeWCT(temp_sol);
@@ -160,11 +161,12 @@ Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pi
     =>   [A,E,C,D,B,F]
     */
     Solution best_sol = {vector<int>(0), sol.wct};
+    vector<int> temp_sol;
 
     for (int i = 0; i < sol.sol.size(); i++) {
         for (int j = 0; j < sol.sol.size(); j++) {
             if (i != j) {
-                vector<int> temp_sol = sol.sol;
+                temp_sol = sol.sol;
                 iter_swap(temp_sol.begin() + i, temp_sol.begin() + j);
 //                printVector(temp_sol, "");
                 int wct = instance.computeWCT(temp_sol);
@@ -192,11 +194,12 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
     QUESTION : l'insertion peuut se faire en fin de liste aussi ?
     */
     Solution best_sol = {vector<int>(0), sol.wct};
+    vector<int> temp_sol;
 
     for (int i = 0; i < sol.sol.size(); i++) {
         for (int j = 0; j < sol.sol.size() + 1; j++) {
             if (i != j and j != i+1) {
-                vector<int> temp_sol = sol.sol;
+                temp_sol = sol.sol;
                 auto it = temp_sol.begin();
                 it = temp_sol.insert ( it+j, sol.sol[i] ); // insert job to position j
                 if (j < i) {
@@ -279,19 +282,57 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
     */
     int i = 0;
     int it = 0;
+    bool stop = false;
     Solution best_sol = init_sol;
-    while (i > neighbourhood_modes.size()) {
-        cout << "neighbourhood mode : " << neighbourhood_modes[i] << endl;
+    while (not stop) { // "do while"
+//        cout << "neighbourhood mode : " << neighbourhood_modes[i] << endl;
         Solution neighbour = chooseNeighbour(best_sol, instance, neighbourhood_modes[i], "FI");
         if (isLocalOptimal(neighbour)) { // if no existing improving solution
             i++;
         } else {
             best_sol = neighbour;
-            cout << "it " << it << " | ";
+//            cout << "it " << it << " | ";
 //            printSol(best_sol);
             i = 0;
             it++;
-        }    
+        }
+        stop = i > neighbourhood_modes.size() - 1;
     }
     return best_sol;
+}
+
+vector<vector<int>> readBestSolFromFile(char * filename) {
+    // TODO : must be working on ubuntu and windows with relative path
+
+    bool everythingOK = true;
+    double wct;
+    string str;
+    ifstream fileIn;
+
+    vector<vector<int>> best_solutions = {vector<int>(), vector<int>()};
+
+    fileIn.open(filename);
+
+    if ( fileIn.is_open() ) {
+        fileIn >> str; fileIn >> str; fileIn >> str; // "Problem , BS" => skip first line
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 30; ++j) {
+                fileIn >> str; // The instance name, not important !
+                fileIn >> str; // "," not important
+                fileIn >> wct; // best solution wct
+                cout << wct << endl;
+                best_solutions[i].push_back( (int) wct);
+            }
+        }
+
+        cout << "All is read from file." << std::endl;
+        fileIn.close();
+    }
+    else {
+        cout    << "ERROR. file:pfspInstance.cpp, method:readBestSolFromFile, "
+                << "error while opening file " << filename << endl;
+        everythingOK = false;
+    }
+
+    return best_solutions;
 }

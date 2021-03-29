@@ -64,6 +64,7 @@ class PfspInstance{
         /* Read Data from a file : */
         bool readDataFromFile(char * fileName);
 
+
         void WCTfirstMach(vector<long int> & prev_mach_endtimes, vector< int > & sol);
         void WCTotherMath(vector<long int> & prev_mach_endtimes, long int &prev_job_endtime, vector< int > & sol);
         long int computeWCT (vector< int > & sol);

@@ -72,10 +72,7 @@ void testAllAlgos(PfspInstance instance) {
     Solution start_sol_SRZ = generateInitialSolution(init_rules[1], instance);
     vector<Solution> init_sols = {start_sol_R, start_sol_SRZ};
     cout << "---------------------------" << endl;
-//    // RANDOM INIT SOL, run combinatioin of FI, BI and T, E, I
-//    runAllmodes(instance, start_sol_R, "R", pivoting_rules, neighbourhood_modes);
-//    // SRZ INIT SOL, run combinatioin of FI, BI and T, E, I
-//    runAllmodes(instance, start_sol_SRZ, "SRZ", pivoting_rules, neighbourhood_modes);
+
     auto start = chrono::steady_clock::now();
     Solution solution;
     for (int s = 0; s < 2; s++) {
@@ -119,6 +116,10 @@ void testVNDall(PfspInstance instance) {
     }
     auto end = chrono::steady_clock::now();
     cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
+}
+
+void testAllInstances() {
+
 }
 
 /***************************************************************************/
@@ -172,7 +173,7 @@ void testMediumInstance() {
     int wct = instance.computeWCT(random_solution.sol);
     cout << "WCT of random sol : " << wct << endl;
 
-    testAllAlgos(instance);
+//    testAllAlgos(instance);
     cout << "==================================" << endl;
     testVNDall(instance);
 }
@@ -198,7 +199,7 @@ void testBigInstance() {
     int wct = instance.computeWCT(random_solution.sol);
     cout << "WCT of random sol : " << wct << endl;
 
-    testAllAlgos(instance);
+//    testAllAlgos(instance);
     cout << "==================================" << endl;
     testVNDall(instance);
 }
@@ -230,11 +231,14 @@ int main(int argc, char *argv[])
     srand ( time(NULL) );
     // srand(0);
 
+    char *filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\instances\\bestSolutions.txt";
+    vector<vector<int>> best_solutions =  readBestSolFromFile(filenameBestSols);
+
 //    testSmallInstance();
 
 //    testMediumInstance();
 
-    testBigInstance();
+//    testBigInstance();
 
 
     return 0;

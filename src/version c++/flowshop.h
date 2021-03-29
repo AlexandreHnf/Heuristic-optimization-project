@@ -39,4 +39,6 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
 // For tests
 //double averageRelativePercentageDev()
 
+vector<vector<int>> readBestSolFromFile(char * filename);
+
 #endif //VERSION_C___FLOWSHOP_H

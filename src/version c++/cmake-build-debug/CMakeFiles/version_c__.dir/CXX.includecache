@@ -6,25 +6,31 @@
 
 #IncludeRegexTransform: 
 
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
-string
--
-vector
--
-
-D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/main.cpp
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.cpp
 iostream
+-
+cstdlib
+-
+cstdio
 -
 cstdlib
 -
 ctime
 -
-chrono
+algorithm
+-
+bits/stdc++.h
 -
 pfspinstance.h
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 flowshop.h
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+string
+-
+vector
+-
 
 D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
 string
