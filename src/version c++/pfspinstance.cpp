@@ -86,7 +86,7 @@ bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
     if ( fileIn.is_open() ) {
         fileIn >> nb_jobs;
         fileIn >> nb_mach;
-        cout << "Nb jobs : " << nb_jobs << ", nb mach : " << nb_mach << endl;
+//        cout << "Nb jobs : " << nb_jobs << ", nb mach : " << nb_mach << endl;
         allowMatrixMemory(nb_jobs, nb_mach);
 
         for (j = 0; j < nb_jobs; ++j) {
@@ -107,7 +107,7 @@ bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
             weights[j] = readValue;
         }
 
-        cout << "All is read from file." << std::endl;
+//        cout << "All is read from file." << std::endl;
         fileIn.close();
     }
     else {

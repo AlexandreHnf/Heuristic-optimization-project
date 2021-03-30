@@ -1,0 +1,45 @@
+ 	 a1 	        a2 	      a3 	     a4 	    a5 ... a12
+instance BS1 CT1 RPD1 | BS CT2 RPD2 | BS3 CT3 RPD3 | BS4 CP4 RPD4 | 
+
+
+questions to answer : 
+
+1) which initial solution is preferable
+	- R-FI-I & S-FI-I
+	- R-FI-E & S-FI-E
+	- R-FI-T & S-FI-T
+	- R-BI-I & S-BI-I
+	- R-BI-E & S-BI-E
+	- R-BI-T & S-BI-T
+	
+2) which pivoting rule generates better quality solutions
+	- FI-R-I & BI-R-I
+	- FI-R-E & BI-R-E
+	- FI-R-T & BI-R-T
+	- FI-S-I & BI-S-I
+	- FI-S-E & BI-S-E
+	- FI-S-T & BI-S-T
+
+3) which pivoting rule is faster
+	- same as 2)
+
+4) which neighborhood generates better quality solutions
+	=> I-E, I-T, E-T
+
+	- I-R-FI & E-R-FI
+	- I-R-BI & E-R-BI
+	- I-S-FI & E-S-FI
+	- I-S-BI & E-S-BI
+
+	- I-R-FI & T-R-FI
+	- I-R-BI & T-R-BI
+	- I-S-FI & T-S-FI
+	- I-S-BI & T-S-BI
+	
+	- T-R-FI & E-R-FI
+	- T-R-BI & E-R-BI
+	- T-S-FI & E-S-FI
+	- T-S-BI & E-S-BI
+
+5) what computation time is required to reach local optima
+	- average of computation time for each number or jobs and for each 	algorithm ?
