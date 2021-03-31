@@ -75,8 +75,11 @@ string getInstanceName(int i, int j) {
 
 void writeAlgoResToFile(vector<vector<int>> all_wcts, vector<vector<double>> all_rpds) {
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
-    vector<string> filenames = {"D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_wct.txt",
-                                "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_rpd.txt"};
+    // vector<string> filenames = {"D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_wct.txt",
+    //                             "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_rpd.txt"};
+
+	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
+								
 
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
@@ -84,27 +87,28 @@ void writeAlgoResToFile(vector<vector<int>> all_wcts, vector<vector<double>> all
         myfile << "instance,R_FI_T,R_FI_E,R_FI_I,R_BI_T,R_BI_E,R_BI_I,S_FI_T,S_FI_E,S_FI_I,S_BI_T,S_BI_E,S_BI_I\n";
 
         string line;
-        for (int i = 0; i < 30; i++) { // TODO : change to all_wcts.size()
-            int inst_nb_index = 0;
-            if (i > 29) {
-                inst_nb_index++;
-            }
-            line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
-            for (int a = 0; a < 12; a++) {
-                if (k == 0) { // if first file : WCTs
-                    line += to_string(all_wcts[i][a]);
-                } else { // if second file : RPDs
-                    line += to_string(all_rpds[i][a]);
-                }
+		int global_index = 0;
+		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+			for (int i = 0; i < 30; i++) { // TODO : change to all_wcts.size()
+				
+				line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
+				for (int a = 0; a < 12; a++) {
+					if (k == 0) { // if first file : WCTs
+						line += to_string(all_wcts[global_index][a]);
+					} else { // if second file : RPDs
+						line += to_string(all_rpds[global_index][a]);
+					}
 
-                if (a < 12 - 1) {
-                    line += ",";
-                } else {
-                    line += "\n";
-                }
-            }
-            myfile << line;
-        }
+					if (a < 12 - 1) {
+						line += ",";
+					} else {
+						line += "\n";
+					}
+				}
+				myfile << line;
+				global_index++;
+			}
+		}
         myfile.close();
     }
     cout << "written to files : ok" << endl;
@@ -209,7 +213,8 @@ vector<vector<int>> IItestAllInstances(vector<vector<int>> & all_wcts, vector<ve
     */
     vector<vdouble> avg_CTs = {vdouble(12), vdouble(12)};
     vector<vdouble> avg_RPDs = {vdouble(12), vdouble(12)};
-    string base_filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\";
+    // string base_filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\";
+    string base_filenameW = "instances/";
     string instance_name;
 
     int inst_nb = 0;
@@ -217,7 +222,7 @@ vector<vector<int>> IItestAllInstances(vector<vector<int>> & all_wcts, vector<ve
     auto start = chrono::steady_clock::now();
     // all instances with 50 and then 100 jobs :
     // TODO mettre i < 2 pour avoir les instances 100
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 30; j++) {
             instance_name = getInstanceName(i, j + 1);
             string inst_filename = base_filenameW + instance_name;
@@ -260,7 +265,8 @@ void testSmallInstance() {
     cout << "========= TEST small instance =================================" << endl;
     PfspInstance small_instance;
 
-    string filenameSmall = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\small instance\\05_03_01";
+    // string filenameSmall = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\small instance\\05_03_01";
+    string filenameSmall = "small instance/05_03_01";
     if (! small_instance.readDataFromFile(filenameSmall) )
         return;
 
@@ -288,7 +294,8 @@ void testSmallInstance() {
 void testMediumInstance(vector<vector<int>> best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
-    string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    // string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    string filenameW = "instances/50_20_01";
 
     /* Create instance object */
     PfspInstance instance;
@@ -320,7 +327,8 @@ void testMediumInstance(vector<vector<int>> best_knowns) {
 
 void testBigInstance(vector<vector<int>> best_knowns) {
     cout << "=============== TEST instance BIG (100) ================" << endl;
-    string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\100_20_01";
+    // string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\100_20_01";
+    string filenameW = "instances/100_20_01";
 
     /* Create instance object */
     PfspInstance instance;
@@ -372,7 +380,8 @@ int main(int argc, char *argv[])
 //    srand ( time(NULL) );
      srand(0);
 
-    string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\bestSolutions.txt";
+    // string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\bestSolutions.txt";
+    string filenameBestSols = "instances/bestSolutions.txt";
     vector<vector<int>> best_knowns =  readBestSolFromFile(filenameBestSols);
 //    cout << best_knowns << endl;
 
