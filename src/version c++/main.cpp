@@ -6,8 +6,26 @@
 #include "pfspinstance.h"
 #include "flowshop.h"
 
+#define FILE_WINDOWS_BASE "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
+#define FILE_II_ALL_INST_WCT FILE_WINDOWS_BASE "results\\II_WCT_test.txt"
+#define FILE_II_ALL_INST_RPD FILE_WINDOWS_BASE "results\\II_RPD_test.txt"
+#define FILE_VND_ALL_INST_WCT FILE_WINDOWS_BASE "results\\VND_WCT_test.txt"
+#define FILE_VND_ALL_INST_RPD FILE_WINDOWS_BASE "results\\VND_RPD_test.txt"
+
+#define FILE_INSTANCES FILE_WINDOWS_BASE "instances\\"
+#define FILE_INST_SMALL FILE_WINDOWS_BASE "small instance\\05_03_01";
+#define FILE_INST_MEDIUM FILE_WINDOWS_BASE "instances\\50_20_01";
+#define FILE_INST_BIG FILE_WINDOWS_BASE "instances\\100_20_01";
+#define FILE_BEST_KNOWN_SOLS FILE_WINDOWS_BASE "instances\\bestSolutions.txt";
+#define FILE_II_AVG_RPDS FILE_WINDOWS_BASE "results\\II_avgRPDs_test.txt"
+#define FILE_II_AVG_CTS FILE_WINDOWS_BASE "results\\II_avgCTs_test.txt"
+#define FILE_VND_AVG_RPDS FILE_WINDOWS_BASE "results\\VND_avgRPDs_test.txt"
+#define FILE_VND_AVG_CTS FILE_WINDOWS_BASE "results\\VND_avgCTs_test.txt"
+
 using namespace std;
 typedef vector<double> vdouble;
+typedef vector<vector<int>> vvint;
+typedef vector<vector<double>> vvdouble;
 
 template <typename T>
 std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
@@ -73,33 +91,35 @@ string getInstanceName(int i, int j) {
     return instance_name + instance_nb;
 }
 
-void writeAlgoResToFile(vector<vector<int>> all_wcts, vector<vector<double>> all_rpds) {
+void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header, vector<string> filenames) {
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
-    // vector<string> filenames = {"D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_wct.txt",
-    //                             "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\results\\all_algos_all_instances_rpd.txt"};
 
-	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
+//             FILE_WINDOWS_BASE "results\\all_algos_all_instances_wct.txt",
+//                                 FILE_WINDOWS_BASE "results\\all_algos_all_instances_rpd.txt"};
+
+//	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
 								
-
+    int nb_algos = all_wcts[0].size();
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
         myfile.open(filenames[k]);
-        myfile << "instance,R_FI_T,R_FI_E,R_FI_I,R_BI_T,R_BI_E,R_BI_I,S_FI_T,S_FI_E,S_FI_I,S_BI_T,S_BI_E,S_BI_I\n";
+        myfile << header;
 
         string line;
 		int global_index = 0;
-		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
-			for (int i = 0; i < 30; i++) { // TODO : change to all_wcts.size()
+		// TODO : change to 2
+		for (int inst_nb_index = 0; inst_nb_index < 1; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+			for (int i = 0; i < 30; i++) {
 				
 				line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
-				for (int a = 0; a < 12; a++) {
+				for (int a = 0; a < nb_algos; a++) {
 					if (k == 0) { // if first file : WCTs
 						line += to_string(all_wcts[global_index][a]);
 					} else { // if second file : RPDs
 						line += to_string(all_rpds[global_index][a]);
 					}
 
-					if (a < 12 - 1) {
+					if (a < nb_algos - 1) {
 						line += ",";
 					} else {
 						line += "\n";
@@ -111,6 +131,31 @@ void writeAlgoResToFile(vector<vector<int>> all_wcts, vector<vector<double>> all
 		}
         myfile.close();
     }
+    cout << "written to files : ok" << endl;
+}
+
+void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
+    // stats = either average computation times, either average relative percentage deviations
+    ofstream myfile;
+    myfile.open(filename);
+    myfile << header;
+    string line;
+    // TODO : change to 2
+    for (int inst_nb_index = 0; inst_nb_index < 1; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+        line = "50,";
+        if (inst_nb_index == 1)
+            line = "100,";
+        for (int a = 0; a < stats[0].size(); a++) {
+            line += to_string(stats[inst_nb_index][a]);
+            if (a < stats[0].size() - 1) {
+                line += ",";
+            } else {
+                line += "\n";
+            }
+        }
+        myfile << line;
+    }
+    myfile.close();
     cout << "written to files : ok" << endl;
 }
 
@@ -127,7 +172,7 @@ double relativePercentageDeviation(int wct, int best_known) {
     return 100 * (((double) wct - (double) best_known) / (double) best_known);
 }
 
-void testAllAlgos(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known, vector<vector<int>> &all_wcts, int inst_nb) {
+void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known, vvint &all_wcts, int inst_nb) {
     /*
     1)  R - FI - T          7)  S - FI - T
     2)  R - FI - E          8)  S - FI - E
@@ -169,61 +214,30 @@ void testAllAlgos(PfspInstance instance, vdouble &computation_times, vdouble &RP
     cout << "====================================" << endl;
 }
 
-void testVNDall(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known) {
-    /*
-     Test all combination of VND-PFSP on all instances
-     result = a relative percentage deviation per algo + computation time of each algo
-     on the given instance.
-    */
-    cout << "=== TEST ALL VND (4) ===" << endl;
-    vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"T", "E", "I"}, vector<string>{"T", "I", "E"}};
 
-    Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
-    Solution start_sol_SRZ = generateInitialSolution(modes[0][1], instance);
-    vector<Solution> init_sols = {start_sol_R, start_sol_SRZ};
-    cout << "---------------------------" << endl;
-    Solution solution;
-
-    auto start = chrono::steady_clock::now();
-    for (int s = 0; s < 2; s++) {
-        for (int n = 1; n < 3; n++) {
-            auto start_alg_time = chrono::steady_clock::now();
-            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
-                            modes[n][1] << "-" << modes[n][2] << endl;
-            solution = variableNeighbourhoodDescent(modes[n], instance, init_sols[s]);
-            printSol(solution);
-            auto end_alg_time = chrono::steady_clock::now();
-            computation_times[s*2+n-1] = chrono::duration <double> (end_alg_time-start_alg_time).count();
-            RPD[s*2+n-1] = relativePercentageDeviation(solution.wct, best_known);
-            cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
-        }
-    }
-    auto end = chrono::steady_clock::now();
-    double timing = chrono::duration <double> (end-start).count();
-    cout << "4 VND Done in " << timing << "sec" << endl;
-}
 
 /***************************************************************************/
 
-vector<vector<int>> IItestAllInstances(vector<vector<int>> & all_wcts, vector<vector<double>> & all_rpds, vector<vector<int>> best_knowns) {
+void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CTs, vvdouble & avg_RPDs, vvint best_knowns) {
     /*
     Run the 12 algos on each instance
      => 12 algos on 30 instances of 50 jobs and then on 30 instances of 100 jobs
-     TODO : srand ( time(NULL) ); for each instance
+     result = an average relative percentage deviation per algo + average computation time of each algo
+     and one average per job nb so 50 and 100 => 2 averages per algo => 24 in total (12 algos)
     */
-    vector<vdouble> avg_CTs = {vdouble(12), vdouble(12)};
-    vector<vdouble> avg_RPDs = {vdouble(12), vdouble(12)};
-    // string base_filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\";
-    string base_filenameW = "instances/";
+
+//    string base_filenameW = FILE_WINDOWS_BASE "instances\\";
+    string base_filenameW = FILE_INSTANCES;
+//    string base_filenameW = "instances/";
     string instance_name;
 
     int inst_nb = 0;
 
     auto start = chrono::steady_clock::now();
     // all instances with 50 and then 100 jobs :
-    // TODO mettre i < 2 pour avoir les instances 100
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 30; j++) {
+
+    for (int i = 0; i < 1; i++) {  // TODO mettre i < 2 pour avoir les instances 100
+        for (int j = 0; j < 30; j++) { // nb of instances per job nb
             instance_name = getInstanceName(i, j + 1);
             string inst_filename = base_filenameW + instance_name;
             cout << "Instance " << instance_name << ": " << endl;
@@ -232,13 +246,11 @@ vector<vector<int>> IItestAllInstances(vector<vector<int>> & all_wcts, vector<ve
 
             vdouble computation_times(12);
             vdouble RPD(12);
-            testAllAlgos(instance, computation_times, RPD, best_knowns[i][j], all_wcts, inst_nb);
+            testAllAlgosII(instance, computation_times, RPD, best_knowns[i][j], all_wcts, inst_nb);
             for (int k = 0; k < 12; k++) {
                 avg_CTs[i][k] += computation_times[k] / 30;
                 avg_RPDs[i][k] += RPD[k] / 30;
                 all_rpds[inst_nb].push_back(RPD[k]);
-//                cout << "Computing times : " << computation_times << endl;
-//                cout << "Relative percentage deviations : " << RPD << endl;
             }
             inst_nb++;
         }
@@ -249,14 +261,108 @@ vector<vector<int>> IItestAllInstances(vector<vector<int>> & all_wcts, vector<ve
     // TODO : diviser les sommmes par le nombre d'élements pour avoir l'avg
     cout << "END ========================= " << endl;
     cout << "All instances done in " << timing << "sec" << endl;
-    cout << "average CT : " << avg_CTs << endl;
-    cout << "average RPD : " << avg_RPDs << endl;
+    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+
     for (int k = 0; k < all_wcts.size(); k++) {
         cout << "instance " << k << endl;
         cout << all_wcts[k] << endl;
     }
+}
 
-    return all_wcts;
+/***************************************************************************/
+
+
+
+void testAllAlgosVND(PfspInstance instance, vdouble &computation_times, vdouble &RPD, vvint &all_wcts, int best_known, int inst_nb) {
+    /*
+     Test all combination of VND-PFSP on 1 instance
+     result = a relative percentage deviation per algo + computation time per algo
+     on the given instance.
+
+     1) R-T-E-I   2) R-T-I-E   3) S-T-E-I   4) S-T-I-E
+    */
+    cout << "=== TEST ALL VND (4) ===" << endl;
+    vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"T", "E", "I"}, vector<string>{"T", "I", "E"}};
+    int algo_id = 0;
+    Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
+    Solution start_sol_SRZ = generateInitialSolution(modes[0][1], instance);
+    vector<Solution> init_sols = {start_sol_R, start_sol_SRZ};
+
+    auto start = chrono::steady_clock::now();
+    Solution solution;
+    for (int s = 0; s < 2; s++) { // starting modes (Random or SRZ)
+        for (int n = 1; n < 3; n++) { // neighbourhoods sets (neighbourhoods 1, neighbourhoods 2)
+            auto start_alg_time = chrono::steady_clock::now();
+            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
+                 modes[n][1] << "-" << modes[n][2] << endl;
+            solution = variableNeighbourhoodDescent(modes[n], instance, init_sols[s]);
+            all_wcts[inst_nb].push_back(solution.wct); // save wct of the algo on this instance
+//            printSol(solution);
+            auto end_alg_time = chrono::steady_clock::now();
+            computation_times[algo_id] = chrono::duration <double> (end_alg_time-start_alg_time).count();
+            RPD[algo_id] = relativePercentageDeviation(solution.wct, best_known);
+//            cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
+            algo_id++;
+        }
+    }
+    auto end = chrono::steady_clock::now();
+    double timing = chrono::duration <double> (end-start).count();
+    cout << "4 VND Done in " << timing << "sec" << endl;
+}
+
+void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CTs, vvdouble & avg_RPDs, vvint best_knowns) {
+    /*
+     Test all combination of VND-PFSP on all instances
+     result = an average relative percentage deviation per algo + average computation time of each algo
+     and one average per job nb so 50 and 100 => 2 averages per algo => 8 in total (4 algos)
+    */
+
+//    string base_filenameW = FILE_WINDOWS_BASE "instances\\";
+    string base_filenameW = FILE_INSTANCES;
+//    string base_filenameW = "instances/";
+    string instance_name;
+
+    int inst_nb = 0;
+
+    auto start = chrono::steady_clock::now();
+    // all instances with 50 and then 100 jobs :
+
+    for (int i = 0; i < 1; i++) {  // TODO mettre i < 2 pour avoir les instances 100
+        for (int j = 0; j < 30; j++) { // nb of instances per job nb
+            instance_name = getInstanceName(i, j + 1);
+            string inst_filename = base_filenameW + instance_name;
+            cout << "Instance " << instance_name << ": " << endl;
+            PfspInstance instance;
+            instance.readDataFromFile(inst_filename);
+
+            vdouble computation_times(4);
+            vdouble RPD(4);
+            testAllAlgosVND(instance, computation_times, RPD, all_wcts, best_knowns[i][j], inst_nb);
+            for (int k = 0; k < 4; k++) {
+                avg_CTs[i][k] += computation_times[k] / 30;
+                avg_RPDs[i][k] += RPD[k] / 30;
+                all_rpds[inst_nb].push_back(RPD[k]);
+            }
+            inst_nb++;
+        }
+    }
+    auto end = chrono::steady_clock::now();
+    double timing = chrono::duration <double> (end-start).count();
+
+    // TODO : diviser les sommmes par le nombre d'élements pour avoir l'avg
+    cout << "END ========================= " << endl;
+    cout << "All instances done in " << timing << "sec" << endl;
+    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+    for (int k = 0; k < all_wcts.size(); k++) {
+        cout << "instance " << k << endl;
+        cout << all_wcts[k] << endl;
+    }
 }
 
 /***************************************************************************/
@@ -265,8 +371,10 @@ void testSmallInstance() {
     cout << "========= TEST small instance =================================" << endl;
     PfspInstance small_instance;
 
-    // string filenameSmall = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\small instance\\05_03_01";
-    string filenameSmall = "small instance/05_03_01";
+    // string filenameSmall = FILE_WINDOWS_BASE "small instance\\05_03_01";
+//    string filenameSmall = "small instance/05_03_01";
+    string filenameSmall = FILE_INST_SMALL;
+
     if (! small_instance.readDataFromFile(filenameSmall) )
         return;
 
@@ -284,18 +392,19 @@ void testSmallInstance() {
 
     vdouble computation_times(12);
     vdouble RPD(12);
-    vector<vector<int>> all_wcts(60);
-    testAllAlgos(small_instance, computation_times, RPD, 144, all_wcts, 0);
+    vvint all_wcts(60);
+    testAllAlgosII(small_instance, computation_times, RPD, 144, all_wcts, 0);
     cout << "==================================" << endl;
 
-    testVNDall(small_instance, computation_times, RPD, 144);
+    testAllAlgosVND(small_instance, computation_times, RPD, all_wcts, 144, 0);
 }
 
-void testMediumInstance(vector<vector<int>> best_knowns) {
+void testMediumInstance(vvint best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
-    // string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
-    string filenameW = "instances/50_20_01";
+    // string filenameW = FILE_WINDOWS_BASE "instances\\50_20_01";
+//    string filenameW = "instances/50_20_01";
+    string filenameW = FILE_INST_MEDIUM;
 
     /* Create instance object */
     PfspInstance instance;
@@ -316,8 +425,8 @@ void testMediumInstance(vector<vector<int>> best_knowns) {
 
     vdouble computation_times(12);
     vdouble RPD(12);
-    vector<vector<int>> all_wcts(60);
-    testAllAlgos(instance, computation_times, RPD, best_knowns[0][0], all_wcts, 0);
+    vvint all_wcts(60);
+    testAllAlgosII(instance, computation_times, RPD, best_knowns[0][0], all_wcts, 0);
 
     cout << "computation times : " << computation_times << endl;
     cout << "relative percentage deviations : " << RPD << endl;
@@ -325,10 +434,11 @@ void testMediumInstance(vector<vector<int>> best_knowns) {
 //    testVNDall(instance);
 }
 
-void testBigInstance(vector<vector<int>> best_knowns) {
+void testBigInstance(vvint best_knowns) {
     cout << "=============== TEST instance BIG (100) ================" << endl;
-    // string filenameW = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\100_20_01";
-    string filenameW = "instances/100_20_01";
+    // string filenameW = FILE_WINDOWS_BASE "instances\\100_20_01";
+//    string filenameW = "instances/100_20_01";
+    string filenameW = FILE_INST_BIG;
 
     /* Create instance object */
     PfspInstance instance;
@@ -349,8 +459,8 @@ void testBigInstance(vector<vector<int>> best_knowns) {
 
     vdouble computation_times(12);
     vdouble RPD(12);
-    vector<vector<int>> all_wcts(60);
-    testAllAlgos(instance, computation_times, RPD, best_knowns[1][0], all_wcts, 0);
+    vvint all_wcts(60);
+    testAllAlgosII(instance, computation_times, RPD, best_knowns[1][0], all_wcts, 0);
     cout << "==================================" << endl;
 //    testVNDall(instance);
 }
@@ -377,23 +487,46 @@ int main(int argc, char *argv[])
      */
 
     /* initialize random seed: */
-//    srand ( time(NULL) );
-     srand(0);
+    srand ( time(NULL) );
+//     srand(0);
 
-    // string filenameBestSols = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\bestSolutions.txt";
-    string filenameBestSols = "instances/bestSolutions.txt";
-    vector<vector<int>> best_knowns =  readBestSolFromFile(filenameBestSols);
+//     string filenameBestSols = FILE_WINDOWS_BASE "instances\\bestSolutions.txt";
+     string filenameBestSols = FILE_BEST_KNOWN_SOLS;
+//    string filenameBestSols = "instances/bestSolutions.txt";
+    vvint best_knowns =  readBestSolFromFile(filenameBestSols);
 //    cout << best_knowns << endl;
 
 //    testSmallInstance();
 //    testMediumInstance(best_knowns);
 //    testBigInstance(best_knowns);
 
-    vector<vector<int>> all_wcts(60); // 60 = nb of instances. Each sublist = 12 wct (12 algos)
-    vector<vector<double>> all_rpds(60); // 60 = nb of instances. Each sublist = 12 wct (12 algos)
-    IItestAllInstances(all_wcts, all_rpds, best_knowns);
-    writeAlgoResToFile(all_wcts, all_rpds);
+    // ======================================================
+    // TEST ITERATIVE IMPROVEMENT ON ALL INSTANCES (50 + 100)
+    vvint all_wcts(60); // 60 = nb of instances. Each sublist = 12 wct (12 algos)
+    vvdouble all_rpds(60); // 60 = nb of instances. Each sublist = 12 wct (12 algos)
+    vvdouble avg_CTs = {vdouble(12), vdouble(12)};
+    vvdouble avg_RPDs = {vdouble(12), vdouble(12)};
+    IItestAllInstances(all_wcts, all_rpds, avg_CTs, avg_RPDs, best_knowns);
+    string header = "instance,R_FI_T,R_FI_E,R_FI_I,R_BI_T,R_BI_E,R_BI_I,S_FI_T,S_FI_E,S_FI_I,S_BI_T,S_BI_E,S_BI_I\n";
+    vector<string> filenames = {FILE_II_ALL_INST_WCT, FILE_II_ALL_INST_RPD};
+    writeAllInstancesResToFile(all_wcts, all_rpds, header, filenames);
+    vector<string> filenamesII_avg = {FILE_II_AVG_RPDS, FILE_II_AVG_CTS};
+    writeAlgosStatsToFile(filenamesII_avg[0], avg_RPDs, header);
+    writeAlgosStatsToFile(filenamesII_avg[1], avg_CTs, header);
 
+    // ======================================================
+    // TEST VARIABLE NEIGHBOURHOOD DESCENT ON ALL INSTANCES (50 + 100)
+    vvint all_wcts_VND(60); // 60 = nb of instances. Each sublist = 4 wct (4 algos)
+    vvdouble all_rpds_VND(60); // 60 = nb of instances. Each sublist = 4 wct (4 algos)
+    vvdouble avg_CTs_VND = {vdouble(4), vdouble(4)};
+    vvdouble avg_RPDs_VND = {vdouble(4), vdouble(4)};
+    VNDtestAllInstances(all_wcts_VND, all_rpds_VND, avg_CTs_VND, avg_RPDs_VND, best_knowns);
+    string header_vnd = "instance,R-T-E-I,R-T-I-E,S-T-E-I,S-T-I-E\n";
+    vector<string> filenamesVND = {FILE_VND_ALL_INST_WCT, FILE_VND_ALL_INST_RPD};
+    writeAllInstancesResToFile(all_wcts_VND, all_rpds_VND, header_vnd, filenamesVND);
+    vector<string> filenamesVND_avg = {FILE_VND_AVG_RPDS, FILE_VND_AVG_CTS};
+    writeAlgosStatsToFile(filenamesVND_avg[0], avg_RPDs_VND, header_vnd);
+    writeAlgosStatsToFile(filenamesVND_avg[1], avg_CTs_VND, header_vnd);
 
     return 0;
 }
