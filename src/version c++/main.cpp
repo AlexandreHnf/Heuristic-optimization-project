@@ -6,21 +6,38 @@
 #include "pfspinstance.h"
 #include "flowshop.h"
 
-#define FILE_WINDOWS_BASE "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
-#define FILE_II_ALL_INST_WCT FILE_WINDOWS_BASE "results\\II_WCT_test.txt"
-#define FILE_II_ALL_INST_RPD FILE_WINDOWS_BASE "results\\II_RPD_test.txt"
-#define FILE_VND_ALL_INST_WCT FILE_WINDOWS_BASE "results\\VND_WCT_test.txt"
-#define FILE_VND_ALL_INST_RPD FILE_WINDOWS_BASE "results\\VND_RPD_test.txt"
+// FOR WINDOWS
+#define W "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
+#define FILE_II_ALL_INST_WCT W "results\\II_WCT_test.txt"
+#define FILE_II_ALL_INST_RPD W "results\\II_RPD_test.txt"
+#define FILE_VND_ALL_INST_WCT W "results\\VND_WCT_test.txt"
+#define FILE_VND_ALL_INST_RPD W "results\\VND_RPD_test.txt"
 
-#define FILE_INSTANCES FILE_WINDOWS_BASE "instances\\"
-#define FILE_INST_SMALL FILE_WINDOWS_BASE "small instance\\05_03_01";
-#define FILE_INST_MEDIUM FILE_WINDOWS_BASE "instances\\50_20_01";
-#define FILE_INST_BIG FILE_WINDOWS_BASE "instances\\100_20_01";
-#define FILE_BEST_KNOWN_SOLS FILE_WINDOWS_BASE "instances\\bestSolutions.txt";
-#define FILE_II_AVG_RPDS FILE_WINDOWS_BASE "results\\II_avgRPDs_test.txt"
-#define FILE_II_AVG_CTS FILE_WINDOWS_BASE "results\\II_avgCTs_test.txt"
-#define FILE_VND_AVG_RPDS FILE_WINDOWS_BASE "results\\VND_avgRPDs_test.txt"
-#define FILE_VND_AVG_CTS FILE_WINDOWS_BASE "results\\VND_avgCTs_test.txt"
+#define FILE_INSTANCES W "instances\\"
+#define FILE_INST_SMALL W "small instance\\05_03_01";
+#define FILE_INST_MEDIUM W "instances\\50_20_01";
+#define FILE_INST_BIG W "instances\\100_20_01";
+#define FILE_BEST_KNOWN_SOLS W "instances\\bestSolutions.txt";
+#define FILE_II_AVG_RPDS W "results\\II_avgRPDs_test.txt"
+#define FILE_II_AVG_CTS W "results\\II_avgCTs_test.txt"
+#define FILE_VND_AVG_RPDS W "results\\VND_avgRPDs_test.txt"
+#define FILE_VND_AVG_CTS W "results\\VND_avgCTs_test.txt"
+
+// FOR UBUNTU
+#define UFILE_II_ALL_INST_WCT "results/II_WCT_test.txt"
+#define UFILE_II_ALL_INST_RPD "results/II_RPD_test.txt"
+#define UFILE_VND_ALL_INST_WCT "results/VND_WCT_test.txt"
+#define UFILE_VND_ALL_INST_RPD "results/VND_RPD_test.txt"
+
+#define UFILE_INSTANCES "instances/"
+#define UFILE_INST_SMALL "small instance/05_03_01";
+#define UFILE_INST_MEDIUM "instances/50_20_01";
+#define UFILE_INST_BIG "instances/100_20_01";
+#define UFILE_BEST_KNOWN_SOLS "instances/bestSolutions.txt";
+#define UFILE_II_AVG_RPDS "results/II_avgRPDs_test.txt"
+#define UFILE_II_AVG_CTS "results/II_avgCTs_test.txt"
+#define UFILE_VND_AVG_RPDS "results/VND_avgRPDs_test.txt"
+#define UFILE_VND_AVG_CTS "results/VND_avgCTs_test.txt"
 
 using namespace std;
 typedef vector<double> vdouble;
@@ -94,8 +111,6 @@ string getInstanceName(int i, int j) {
 void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header, vector<string> filenames) {
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
 
-//             FILE_WINDOWS_BASE "results\\all_algos_all_instances_wct.txt",
-//                                 FILE_WINDOWS_BASE "results\\all_algos_all_instances_rpd.txt"};
 
 //	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
 								
@@ -108,7 +123,7 @@ void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header
         string line;
 		int global_index = 0;
 		// TODO : change to 2
-		for (int inst_nb_index = 0; inst_nb_index < 1; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
 			for (int i = 0; i < 30; i++) {
 				
 				line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
@@ -141,7 +156,7 @@ void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
     myfile << header;
     string line;
     // TODO : change to 2
-    for (int inst_nb_index = 0; inst_nb_index < 1; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+    for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
         line = "50,";
         if (inst_nb_index == 1)
             line = "100,";
@@ -226,9 +241,8 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
      and one average per job nb so 50 and 100 => 2 averages per algo => 24 in total (12 algos)
     */
 
-//    string base_filenameW = FILE_WINDOWS_BASE "instances\\";
-    string base_filenameW = FILE_INSTANCES;
-//    string base_filenameW = "instances/";
+    // string base_filename = FILE_INSTANCES;
+    string base_filename = UFILE_INSTANCES;
     string instance_name;
 
     int inst_nb = 0;
@@ -236,10 +250,10 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
     auto start = chrono::steady_clock::now();
     // all instances with 50 and then 100 jobs :
 
-    for (int i = 0; i < 1; i++) {  // TODO mettre i < 2 pour avoir les instances 100
+    for (int i = 0; i < 2; i++) {  // TODO mettre i < 2 pour avoir les instances 100
         for (int j = 0; j < 30; j++) { // nb of instances per job nb
             instance_name = getInstanceName(i, j + 1);
-            string inst_filename = base_filenameW + instance_name;
+            string inst_filename = base_filename + instance_name;
             cout << "Instance " << instance_name << ": " << endl;
             PfspInstance instance;
             instance.readDataFromFile(inst_filename);
@@ -320,9 +334,8 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
      and one average per job nb so 50 and 100 => 2 averages per algo => 8 in total (4 algos)
     */
 
-//    string base_filenameW = FILE_WINDOWS_BASE "instances\\";
-    string base_filenameW = FILE_INSTANCES;
-//    string base_filenameW = "instances/";
+    // string base_filename = FILE_INSTANCES;
+    string base_filename = UFILE_INSTANCES;
     string instance_name;
 
     int inst_nb = 0;
@@ -330,10 +343,10 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
     auto start = chrono::steady_clock::now();
     // all instances with 50 and then 100 jobs :
 
-    for (int i = 0; i < 1; i++) {  // TODO mettre i < 2 pour avoir les instances 100
+    for (int i = 0; i < 2; i++) {  // TODO mettre i < 2 pour avoir les instances 100
         for (int j = 0; j < 30; j++) { // nb of instances per job nb
             instance_name = getInstanceName(i, j + 1);
-            string inst_filename = base_filenameW + instance_name;
+            string inst_filename = base_filename + instance_name;
             cout << "Instance " << instance_name << ": " << endl;
             PfspInstance instance;
             instance.readDataFromFile(inst_filename);
@@ -371,9 +384,8 @@ void testSmallInstance() {
     cout << "========= TEST small instance =================================" << endl;
     PfspInstance small_instance;
 
-    // string filenameSmall = FILE_WINDOWS_BASE "small instance\\05_03_01";
-//    string filenameSmall = "small instance/05_03_01";
-    string filenameSmall = FILE_INST_SMALL;
+    // string filenameSmall = FILE_INST_SMALL;
+    string filenameSmall = UFILE_INST_SMALL;
 
     if (! small_instance.readDataFromFile(filenameSmall) )
         return;
@@ -402,16 +414,15 @@ void testSmallInstance() {
 void testMediumInstance(vvint best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
-    // string filenameW = FILE_WINDOWS_BASE "instances\\50_20_01";
-//    string filenameW = "instances/50_20_01";
-    string filenameW = FILE_INST_MEDIUM;
+    // string filename = FILE_INST_MEDIUM;
+    string filename = UFILE_INST_MEDIUM;
 
     /* Create instance object */
     PfspInstance instance;
 
     /* Read data from file */
 //    if (! instance.readDataFromFile(argv[1]) )
-    if (! instance.readDataFromFile(filenameW) ) return;
+    if (! instance.readDataFromFile(filename) ) return;
 
     /* solution with initial random values */
     Solution random_solution = generateRndSol(instance);
@@ -436,16 +447,15 @@ void testMediumInstance(vvint best_knowns) {
 
 void testBigInstance(vvint best_knowns) {
     cout << "=============== TEST instance BIG (100) ================" << endl;
-    // string filenameW = FILE_WINDOWS_BASE "instances\\100_20_01";
-//    string filenameW = "instances/100_20_01";
-    string filenameW = FILE_INST_BIG;
+    // string filename = FILE_INST_BIG;
+    string filename = UFILE_INST_BIG;
 
     /* Create instance object */
     PfspInstance instance;
 
     /* Read data from file */
 //    if (! instance.readDataFromFile(argv[1]) )
-    if (! instance.readDataFromFile(filenameW) ) return;
+    if (! instance.readDataFromFile(filename) ) return;
 
     /* solution with initial random values */
     Solution random_solution = generateRndSol(instance);
@@ -490,9 +500,8 @@ int main(int argc, char *argv[])
     srand ( time(NULL) );
 //     srand(0);
 
-//     string filenameBestSols = FILE_WINDOWS_BASE "instances\\bestSolutions.txt";
-     string filenameBestSols = FILE_BEST_KNOWN_SOLS;
-//    string filenameBestSols = "instances/bestSolutions.txt";
+    //  string filenameBestSols = FILE_BEST_KNOWN_SOLS;
+     string filenameBestSols = UFILE_BEST_KNOWN_SOLS;
     vvint best_knowns =  readBestSolFromFile(filenameBestSols);
 //    cout << best_knowns << endl;
 
@@ -508,9 +517,11 @@ int main(int argc, char *argv[])
     vvdouble avg_RPDs = {vdouble(12), vdouble(12)};
     IItestAllInstances(all_wcts, all_rpds, avg_CTs, avg_RPDs, best_knowns);
     string header = "instance,R_FI_T,R_FI_E,R_FI_I,R_BI_T,R_BI_E,R_BI_I,S_FI_T,S_FI_E,S_FI_I,S_BI_T,S_BI_E,S_BI_I\n";
-    vector<string> filenames = {FILE_II_ALL_INST_WCT, FILE_II_ALL_INST_RPD};
+    // vector<string> filenames = {FILE_II_ALL_INST_WCT, FILE_II_ALL_INST_RPD};
+    vector<string> filenames = {UFILE_II_ALL_INST_WCT, UFILE_II_ALL_INST_RPD};
     writeAllInstancesResToFile(all_wcts, all_rpds, header, filenames);
-    vector<string> filenamesII_avg = {FILE_II_AVG_RPDS, FILE_II_AVG_CTS};
+    // vector<string> filenamesII_avg = {FILE_II_AVG_RPDS, FILE_II_AVG_CTS};
+    vector<string> filenamesII_avg = {UFILE_II_AVG_RPDS, UFILE_II_AVG_CTS};
     writeAlgosStatsToFile(filenamesII_avg[0], avg_RPDs, header);
     writeAlgosStatsToFile(filenamesII_avg[1], avg_CTs, header);
 
@@ -522,9 +533,11 @@ int main(int argc, char *argv[])
     vvdouble avg_RPDs_VND = {vdouble(4), vdouble(4)};
     VNDtestAllInstances(all_wcts_VND, all_rpds_VND, avg_CTs_VND, avg_RPDs_VND, best_knowns);
     string header_vnd = "instance,R-T-E-I,R-T-I-E,S-T-E-I,S-T-I-E\n";
-    vector<string> filenamesVND = {FILE_VND_ALL_INST_WCT, FILE_VND_ALL_INST_RPD};
+    // vector<string> filenamesVND = {FILE_VND_ALL_INST_WCT, FILE_VND_ALL_INST_RPD};
+    vector<string> filenamesVND = {UFILE_VND_ALL_INST_WCT, UFILE_VND_ALL_INST_RPD};
     writeAllInstancesResToFile(all_wcts_VND, all_rpds_VND, header_vnd, filenamesVND);
-    vector<string> filenamesVND_avg = {FILE_VND_AVG_RPDS, FILE_VND_AVG_CTS};
+    // vector<string> filenamesVND_avg = {FILE_VND_AVG_RPDS, FILE_VND_AVG_CTS};
+    vector<string> filenamesVND_avg = {UFILE_VND_AVG_RPDS, UFILE_VND_AVG_CTS};
     writeAlgosStatsToFile(filenamesVND_avg[0], avg_RPDs_VND, header_vnd);
     writeAlgosStatsToFile(filenamesVND_avg[1], avg_CTs_VND, header_vnd);
 
