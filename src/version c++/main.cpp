@@ -111,9 +111,6 @@ string getInstanceName(int i, int j) {
 void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header, vector<string> filenames) {
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
 
-
-//	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
-
     int nb_algos = all_wcts[0].size();
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
@@ -414,8 +411,8 @@ void testSmallInstance() {
 void testMediumInstance(vvint best_knowns) {
     cout << "========= TEST instance MEDIUM (50) ================" << endl;
 
-    // string filename = FILE_INST_MEDIUM;
-    string filename = UFILE_INST_MEDIUM;
+     string filename = FILE_INST_MEDIUM;
+//    string filename = UFILE_INST_MEDIUM;
 
     /* Create instance object */
     PfspInstance instance;
@@ -428,7 +425,12 @@ void testMediumInstance(vvint best_knowns) {
     Solution random_solution = generateRndSol(instance);
 
     cout << "Random solution: " << endl;
-//    printSol(random_solution);
+    printSol(random_solution);
+
+    /*Solution with SRZ*/
+    Solution srz_solution = generateInitialSolution("SRZ", instance);
+    cout << "SRZ solution: " << endl;
+    printSol(srz_solution);
 
     /* Compute the WCT of this solution */
     int wct = instance.computeWCT(random_solution.sol);
@@ -497,16 +499,16 @@ int main(int argc, char *argv[])
      */
 
     /* initialize random seed: */
-    srand ( time(NULL) );
-//     srand(0);
+//    srand ( time(NULL) );
+     srand(0);
 
-    //  string filenameBestSols = FILE_BEST_KNOWN_SOLS;
+//      string filenameBestSols = FILE_BEST_KNOWN_SOLS;
      string filenameBestSols = UFILE_BEST_KNOWN_SOLS;
     vvint best_knowns =  readBestSolFromFile(filenameBestSols);
 //    cout << best_knowns << endl;
 
 //    testSmallInstance();
-//    testMediumInstance(best_knowns);
+    testMediumInstance(best_knowns);
 //    testBigInstance(best_knowns);
 
     // ======================================================
@@ -516,7 +518,7 @@ int main(int argc, char *argv[])
     vvdouble avg_CTs = {vdouble(12), vdouble(12)};
     vvdouble avg_RPDs = {vdouble(12), vdouble(12)};
     IItestAllInstances(all_wcts, all_rpds, avg_CTs, avg_RPDs, best_knowns);
-    string header = "instance,R_FI_T,R_FI_E,R_FI_I,R_BI_T,R_BI_E,R_BI_I,S_FI_T,S_FI_E,S_FI_I,S_BI_T,S_BI_E,S_BI_I\n";
+    string header = "instance,RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI\n";
     // vector<string> filenames = {FILE_II_ALL_INST_WCT, FILE_II_ALL_INST_RPD};
     vector<string> filenames = {UFILE_II_ALL_INST_WCT, UFILE_II_ALL_INST_RPD};
     writeAllInstancesResToFile(all_wcts, all_rpds, header, filenames);
@@ -532,7 +534,7 @@ int main(int argc, char *argv[])
     vvdouble avg_CTs_VND = {vdouble(4), vdouble(4)};
     vvdouble avg_RPDs_VND = {vdouble(4), vdouble(4)};
     VNDtestAllInstances(all_wcts_VND, all_rpds_VND, avg_CTs_VND, avg_RPDs_VND, best_knowns);
-    string header_vnd = "instance,R-T-E-I,R-T-I-E,S-T-E-I,S-T-I-E\n";
+    string header_vnd = "instance,RTEI,RTIE,STEI,STIE\n";
     // vector<string> filenamesVND = {FILE_VND_ALL_INST_WCT, FILE_VND_ALL_INST_RPD};
     vector<string> filenamesVND = {UFILE_VND_ALL_INST_WCT, UFILE_VND_ALL_INST_RPD};
     writeAllInstancesResToFile(all_wcts_VND, all_rpds_VND, header_vnd, filenamesVND);
