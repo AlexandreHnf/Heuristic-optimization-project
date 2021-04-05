@@ -113,7 +113,7 @@ void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header
 
 
 //	vector<string> filenames = {"results/all_algos_all_instances_wct.txt", "results/all_algos_all_instances_rpd.txt"};
-								
+
     int nb_algos = all_wcts[0].size();
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
