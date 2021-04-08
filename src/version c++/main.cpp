@@ -156,7 +156,7 @@ void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &
      12 algos = RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI
     */
     srand ( time(NULL) ); // RANDOM SEED per instance
-    cout << "=== TEST ALL ALGOS (12) ===" << endl;
+//    cout << "=== TEST ALL ALGOS (12) ===" << endl;
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
     int algo_id = 0;
     Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
@@ -185,7 +185,7 @@ void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &
     }
     auto end = chrono::steady_clock::now();
     cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
-    cout << "====================================" << endl;
+//    cout << "====================================" << endl;
 }
 
 
@@ -234,10 +234,10 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
 
     cout << "END ========================= " << endl;
     cout << "All II instances done in " << timing << "sec" << endl;
-    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 /***************************************************************************/
@@ -252,7 +252,7 @@ void testAllAlgosVND(PfspInstance instance, vdouble &computation_times, vdouble 
 
      1) R-T-E-I   2) R-T-I-E   3) S-T-E-I   4) S-T-I-E
     */
-    cout << "=== TEST ALL VND (4) ===" << endl;
+//    cout << "=== TEST ALL VND (4) ===" << endl;
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"T", "E", "I"}, vector<string>{"T", "I", "E"}};
     int algo_id = 0;
     Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
@@ -321,10 +321,10 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
 
     cout << "END ========================= " << endl;
     cout << "All VND instances done in " << timing << "sec" << endl;
-    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 
@@ -445,7 +445,6 @@ void processArgv(int argc, char *argv[]) {
     }
 }
 
-
 /***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/
@@ -459,25 +458,8 @@ int main(int argc, char *argv[]) {
     # pivoting rule : --bestImprovement (BI), --firstImprovement (FI)
      */
 
-//    processArgv(argc, argv);
+    processArgv(argc, argv);
 
-
-    //                       RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI
-    // average RPD 50 jobs : 31.289, 2.00721, 1.60013, 32.2462, 3.89111, 2.52801, 3.64523, 2.72901, 1.714, 3.6549, 2.75127, 2.01391,
-    // average RPD 100 jobs : 41.2289, 1.72973, 1.9436, 42.2496, 4.90467, 3.78795, 4.58381, 3.20438, 2.12647, 4.58994, 3.51955, 2.52972,
-    vvdouble avg_rpds_II = {{31.289, 2.00721, 1.60013, 32.2462, 3.89111, 2.52801, 3.64523, 2.72901, 1.714, 3.6549, 2.75127, 2.01391},
-                            {41.2289, 1.72973, 1.9436, 42.2496, 4.90467, 3.78795, 4.58381, 3.20438, 2.12647, 4.58994, 3.51955, 2.52972}};
-    //                       RTEI,RTIE,STEI,STIE
-    // average RPD 50 jobs : 1.64959, 1.93493, 1.87812, 1.91929,
-    // average RPD 100 jobs : 1.88406, 2.43476, 2.22576, 2.19636,
-    vvdouble avg_rpds_VND = {{1.64959, 1.93493, 1.87812, 1.91929}, {1.88406, 2.43476, 2.22576, 2.19636}};
-
-    // compare RTEI,RTIE,STEI,STIE with RFE,RFI,SFE,SFI
-    vvdouble PI_VND = VNDpercentageImprovement(avg_rpds_VND, avg_rpds_II, {1, 2, 7, 8});
-    cout << PI_VND << endl;
-
-
-    //
     // =====================================================
     return 0;
 }
