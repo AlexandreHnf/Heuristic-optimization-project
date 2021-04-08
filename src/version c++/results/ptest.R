@@ -1,6 +1,4 @@
 new.getPvalues <- function(aa, bb, best_knowns, myfile) {
-  #best.known <- read.csv("bestSolutions.txt", header=TRUE)
-  #myfile <- read.table("II_WCT_test_inv.txt", header=TRUE, sep=",")
   a.cost <- myfile[,aa] 
   a.cost <- 100 * (a.cost - best.known$BS) / best.known$BS
   b.cost <- myfile[,bb] 
@@ -22,12 +20,15 @@ new.allCombiPvalues <- function(algo_names, nb_combinations, best_knowns, myfile
   for (ai in algo_names) {
     for (aj in algo_names) {
       name <- paste(ai, ",", aj)
+      inv_name <- paste(aj, ",", ai)
       #print(name)
       if (ai != aj) {
-        names[nb_it + 1] <- name    # append algo combination name
-        p <- new.getPvalues(ai, aj, best_knowns, myfile) # p = (ttest p, wilcoxtest p)
-        all_pvalues[nb_it + 1, ] <- c(p[1], p[2]) # append row (ttest p, wilcoxtest p)
-        nb_it = nb_it + 1
+        if (!inv_name %in% names) { 
+          names[nb_it + 1] <- name    # append algo combination name
+          p <- new.getPvalues(ai, aj, best_knowns, myfile) # p = (ttest p, wilcoxtest p)
+          all_pvalues[nb_it + 1, ] <- c(p[1], p[2]) # append row (ttest p, wilcoxtest p)
+          nb_it = nb_it + 1
+        }
       }
     }
   }
@@ -63,19 +64,19 @@ print(p[2])
 # ==============================================================================================
 # open files 
 
-myfileII <- read.table("II_WCT_test_inv.txt", header=TRUE, sep=",")
+myfileII <- read.table("II_WCT_results.csv", header=TRUE, sep=",")
 
 algo_names_II <- c("RFT","RFE","RFI","RBT","RBE","RBI","SFT","SFE","SFI","SBT","SBE","SBI")
 
 # get all pvalues
-all_pvalues_II <- new.allCombiPvalues(algo_names_II, 132, best.knowns, myfileII) # 132 combinations with 12 algos
+all_pvalues_II <- new.allCombiPvalues(algo_names_II, 66, best.knowns, myfileII) # 132 combinations with 12 algos
 print(all_pvalues_II)
 
-# print all best pvalues (above alpha = 0.05), which means pairs of similar algorithms
+# print all best pvalues (above alpha = 0.01), which means pairs of similar algorithms
 new.printBestPvalues(all_pvalues_II, 0.01) 
 
 # write pvalues to file
-write.table(all_pvalues_II, file="pvalues_II.txt", sep="\t", col.names = F, row.names = F)
+write.table(all_pvalues_II, file="pvalues_II.txt", sep="\t", col.names = F, row.names = rownames(all_pvalues_II))
 
 # question 1
 print(paste("RFI-SFI :", all_pvalues_II["RFI , SFI",]))
@@ -94,15 +95,15 @@ print(paste("SFE-SBE :", all_pvalues_II["SFE , SBE",]))
 print(paste("SFT-SBT :", all_pvalues_II["SFT , SBT",]))
 
 # question 3 
-print(paste("RFI-RFE :", all_pvalues_II["RFI , RFE",]))
-print(paste("RBI-RBE :", all_pvalues_II["RBI , RBE",]))
-print(paste("SFI-SFE :", all_pvalues_II["SFI , SFE",]))
-print(paste("SBI-SBE :", all_pvalues_II["SBI , SBE",]))
+print(paste("RFE-RFI :", all_pvalues_II["RFE , RFI",]))
+print(paste("RBE-RBI :", all_pvalues_II["RBE , RBI",]))
+print(paste("SFE-SFI :", all_pvalues_II["SFE , SFI",]))
+print(paste("SBE-SBI :", all_pvalues_II["SBE , SBI",]))
 
-print(paste("RFI-RFT :", all_pvalues_II["RFI , RFT",]))
-print(paste("RBI-RBT :", all_pvalues_II["RBI , RBT",]))
-print(paste("SFI-SFT :", all_pvalues_II["SFI , SFT",]))
-print(paste("SBI-SBT :", all_pvalues_II["SBI , SBT",]))
+print(paste("RFT-RFI :", all_pvalues_II["RFT , RFI",]))
+print(paste("RBT-RBI :", all_pvalues_II["RBT , RBI",]))
+print(paste("SFT-SFI :", all_pvalues_II["SFT , SFI",]))
+print(paste("SBT-SBI :", all_pvalues_II["SBT , SBI",]))
 
 print(paste("RFT-RFE :", all_pvalues_II["RFT , RFE",]))
 print(paste("RBT-RBE :", all_pvalues_II["RBT , RBE",]))
@@ -113,19 +114,19 @@ print(paste("SBT-SBE :", all_pvalues_II["SBT , SBE",]))
 # ============================== TEST VARIABLE NEIGHBOURHOOD DESCENT ====================================
 # ==============================================================================================
 # open file
-myfileVND <- read.table("VND_WCT_test_inv.txt", header=TRUE, sep=",")
+myfileVND <- read.table("VND_WCT_results.csv", header=TRUE, sep=",")
 
 algo_names_VND <- c("RTEI","RTIE","STEI","STIE")
 
 # get all pvalues
-all_pvalues_VND <- new.allCombiPvalues(algo_names_VND, 12, best.knowns, myfileVND) # 12 combinations with 4 algos
+all_pvalues_VND <- new.allCombiPvalues(algo_names_VND, 6, best.knowns, myfileVND) # 12 combinations with 4 algos
 print(all_pvalues_VND)
 
-# print all best pvalues (above alpha = 0.05), which means pairs of similar algorithms
+# print all best pvalues (above alpha = 0.01), which means pairs of similar algorithms
 new.printBestPvalues(all_pvalues_VND, 0.01) 
 
 # write pvalues to file
-write.table(all_pvalues_VND, file="pvalues_VND.txt", sep="\t", col.names = F, row.names = F)
+write.table(all_pvalues_VND, file="pvalues_VND.txt", sep="\t", col.names = F, row.names = rownames(all_pvalues_VND))
 
 # pvalues comparisons : 
 print(paste("RTEI-RTIE :", all_pvalues_VND["RTEI , RTIE",]))
