@@ -1,3 +1,6 @@
+//
+// Created by Alexandre HENEFFE on 0026 26 mars 2021.
+//
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -5,21 +8,6 @@
 #include <fstream>
 #include "pfspinstance.h"
 #include "flowshop.h"
-
-// FOR WINDOWS
-#define W "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
-#define FILE_II_ALL_INST_WCT W "results\\II_WCT_test.txt"
-#define FILE_II_ALL_INST_RPD W "results\\II_RPD_test.txt"
-#define FILE_VND_ALL_INST_WCT W "results\\VND_WCT_test.txt"
-#define FILE_VND_ALL_INST_RPD W "results\\VND_RPD_test.txt"
-
-#define FILE_INSTANCES W "instances\\"
-#define FILE_INST_SMALL W "small instance\\05_03_01";
-#define FILE_BEST_KNOWN_SOLS W "instances\\bestSolutions.txt";
-#define FILE_II_AVG_RPDS W "results\\II_avgRPDs_test.txt"
-#define FILE_II_AVG_CTS W "results\\II_avgCTs_test.txt"
-#define FILE_VND_AVG_RPDS W "results\\VND_avgRPDs_test.txt"
-#define FILE_VND_AVG_CTS W "results\\VND_avgCTs_test.txt"
 
 // FOR UBUNTU
 #define UFILE_II_ALL_INST_WCT "results/II_WCT_results.csv"
@@ -81,7 +69,6 @@ void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header
 
         string line;
 		int global_index = 0;
-//		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
 		for (int inst_nb_index = 1; inst_nb_index >= 0; inst_nb_index--) { // 0 = instances 50, 1 = instances 100
 			for (int i = 0; i < 30; i++) {
 				
@@ -162,7 +149,6 @@ void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &
     Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
     Solution start_sol_SRZ = generateInitialSolution(modes[0][1], instance);
     vector<Solution> init_sols = {start_sol_R, start_sol_SRZ};
-//    cout << "---------------------------" << endl;
 
     auto start = chrono::steady_clock::now();
     Solution solution;
@@ -172,20 +158,15 @@ void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &
                 auto start_alg_time = chrono::steady_clock::now();
                 solution = iterativeImprovement(modes[1][p], modes[2][n], instance, init_sols[s]);
                 all_wcts[inst_nb].push_back(solution.wct); // save wct of the algo on this instance
-//                cout << "ALGO " << modes[0][s] << "-" << modes[1][p] << "-" << modes[2][n] << ": " << endl;
-//                printSol(solution);
                 auto end_alg_time = chrono::steady_clock::now();
                 computation_times[algo_id] = chrono::duration <double> (end_alg_time-start_alg_time).count();
                 RPD[algo_id] = relativePercentageDeviation(solution.wct, best_known);
-//                cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
-//                cout << "-------------------" << endl;
                 algo_id++;
             }
         }
     }
     auto end = chrono::steady_clock::now();
     cout << "Done in " << chrono::duration <double> (end-start).count() << "sec" << endl;
-//    cout << "====================================" << endl;
 }
 
 
@@ -201,7 +182,6 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
      12 algos = RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI
     */
 
-    // string base_filename = FILE_INSTANCES;
     string base_filename = UFILE_INSTANCES;
     string instance_name;
 
@@ -234,10 +214,6 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
 
     cout << "END ========================= " << endl;
     cout << "All II instances done in " << timing << "sec" << endl;
-//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 /***************************************************************************/
@@ -252,7 +228,6 @@ void testAllAlgosVND(PfspInstance instance, vdouble &computation_times, vdouble 
 
      1) R-T-E-I   2) R-T-I-E   3) S-T-E-I   4) S-T-I-E
     */
-//    cout << "=== TEST ALL VND (4) ===" << endl;
     vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"T", "E", "I"}, vector<string>{"T", "I", "E"}};
     int algo_id = 0;
     Solution start_sol_R = generateInitialSolution(modes[0][0], instance);
@@ -264,15 +239,11 @@ void testAllAlgosVND(PfspInstance instance, vdouble &computation_times, vdouble 
     for (int s = 0; s < 2; s++) { // starting modes (Random or SRZ)
         for (int n = 1; n < 3; n++) { // neighbourhoods sets (neighbourhoods 1, neighbourhoods 2)
             auto start_alg_time = chrono::steady_clock::now();
-//            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
-//                 modes[n][1] << "-" << modes[n][2] << endl;
             solution = variableNeighbourhoodDescent(modes[n], instance, init_sols[s]);
             all_wcts[inst_nb].push_back(solution.wct); // save wct of the algo on this instance
-//            printSol(solution);
             auto end_alg_time = chrono::steady_clock::now();
             computation_times[algo_id] = chrono::duration <double> (end_alg_time-start_alg_time).count();
             RPD[algo_id] = relativePercentageDeviation(solution.wct, best_known);
-//            cout << "==> " << chrono::duration <double> (end_alg_time-start_alg_time).count() << "sec" << endl;
             algo_id++;
         }
     }
@@ -288,7 +259,6 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
      and one average per job nb so 50 and 100 => 2 averages per algo => 8 in total (4 algos)
     */
 
-    // string base_filename = FILE_INSTANCES;
     string base_filename = UFILE_INSTANCES;
     string instance_name;
 
@@ -321,10 +291,6 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
 
     cout << "END ========================= " << endl;
     cout << "All VND instances done in " << timing << "sec" << endl;
-//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 

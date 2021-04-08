@@ -1,5 +1,5 @@
 //
-// Created by Alexandre on 0026 26 mars 2021.
+// Created by Alexandre HENEFFE on 0026 26 mars 2021.
 //
 
 #include <iostream>
@@ -57,14 +57,11 @@ bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
     string str;
     ifstream fileIn;
 
-//    cout << "file : " << fileName << endl;
-
     fileIn.open(fileName);
 
     if ( fileIn.is_open() ) {
         fileIn >> nb_jobs;
         fileIn >> nb_mach;
-//        cout << "Nb jobs : " << nb_jobs << ", nb mach : " << nb_mach << endl;
         allowMatrixMemory(nb_jobs, nb_mach);
 
         for (j = 0; j < nb_jobs; ++j) {
@@ -85,7 +82,6 @@ bool PfspInstance::readDataFromFile(basic_string<char> fileName) {
             weights[j] = readValue;
         }
 
-//        cout << "All is read from file." << std::endl;
         fileIn.close();
     }
     else {
