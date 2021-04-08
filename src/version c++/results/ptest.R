@@ -1,26 +1,3 @@
-new.getTTpvalues <- function(aa, bb, best_knowns, res_file) {
-  acost = res_file[,aa]
-  acost <- 100 * (acost - best.known$BS) / best.known$BS
-  bcost <- myfile[,bb] 
-  bcost <- 100 * (bcost - best.known$BS) / best.known$BS
-  tt_pvalue <- t.test(acost, bcost, paired=T)$p.value
-  print(paste("t-test p-value : ", tt_pvalue))
-  return(tt_pvalue)
-}
-
-new.getWTpvalues <- function(aa, bb, best_knowns, res_file) {
-  acost = res_file[,aa]
-  acost <- 100 * (acost - best.known$BS) / best.known$BS
-  bcost <- myfile[,bb] 
-  bcost <- 100 * (bcost - best.known$BS) / best.known$BS
-  tt_pvalue <- t.test(acost, bcost, paired=T)$p.value
-  wt_pvalue <- wilcox.test(a.cost, b.cost, paired=T)$p.value
-  print(paste("wilcow test p-value : ", wt_pvalue))
-  return(wt_pvalue)
-}
-
-# ==============================================================================
-
 new.getPvalues <- function(aa, bb, best_knowns, myfile) {
   #best.known <- read.csv("bestSolutions.txt", header=TRUE)
   #myfile <- read.table("II_WCT_test_inv.txt", header=TRUE, sep=",")
@@ -28,9 +5,9 @@ new.getPvalues <- function(aa, bb, best_knowns, myfile) {
   a.cost <- 100 * (a.cost - best.known$BS) / best.known$BS
   b.cost <- myfile[,bb] 
   b.cost <- 100 * (b.cost - best.known$BS) / best.known$BS
-  tt_pvalue <- t.test(a.cost, b.cost, paired=T)$p.value
+  tt_pvalue <- t.test(a.cost, b.cost, paired=T, conf.level = 0.99)$p.value
   #print(paste("t-test p-value : ", tt_pvalue))
-  wt_pvalue <- wilcox.test(a.cost, b.cost, paired=T)$p.value
+  wt_pvalue <- wilcox.test(a.cost, b.cost, paired=T, conf.level = 0.99)$p.value
   #print(paste("wilcow test p-value : ", wt_pvalue))
   
   pvalues <- c(tt_pvalue, wt_pvalue)
@@ -62,12 +39,12 @@ new.allCombiPvalues <- function(algo_names, nb_combinations, best_knowns, myfile
   return(all_pvalues)
 }
 
-new.printBestPvalues<- function(all_pvalues) {
+new.printBestPvalues<- function(all_pvalues, alpha) {
   n <- rownames(all_pvalues) # row names
   print("BEST PVALUES:")
   for (i in 1:length(all_pvalues[, 1])) {
     #print(paste("===> ", all_pvalues[i,]))
-    if (all_pvalues[i,][1] > 0.05) {
+    if (all_pvalues[i,][1] > alpha) {
       print(n[i]) # print row name (pair of algos)
       print(all_pvalues[i,]) 
     }
@@ -95,13 +72,43 @@ all_pvalues_II <- new.allCombiPvalues(algo_names_II, 132, best.knowns, myfileII)
 print(all_pvalues_II)
 
 # print all best pvalues (above alpha = 0.05), which means pairs of similar algorithms
-new.printBestPvalues(all_pvalues_II) 
+new.printBestPvalues(all_pvalues_II, 0.01) 
 
 # write pvalues to file
 write.table(all_pvalues_II, file="pvalues_II.txt", sep="\t", col.names = F, row.names = F)
 
 # question 1
 print(paste("RFI-SFI :", all_pvalues_II["RFI , SFI",]))
+print(paste("RFE-SFE :", all_pvalues_II["RFE , SFE",]))
+print(paste("RFT-SFT :", all_pvalues_II["RFT , SFT",]))
+print(paste("RBI-SBI :", all_pvalues_II["RBI , SBI",]))
+print(paste("RBE-SBE :", all_pvalues_II["RBE , SBE",]))
+print(paste("RBT-SBT :", all_pvalues_II["RBT , SBT",]))
+
+# question 2 
+print(paste("RFI-RBI :", all_pvalues_II["RFI , RBI",]))
+print(paste("RFE-RBE :", all_pvalues_II["RFE , RBE",]))
+print(paste("RFT-RBT :", all_pvalues_II["RFT , RBT",]))
+print(paste("SFI-SBI :", all_pvalues_II["SFI , SBI",]))
+print(paste("SFE-SBE :", all_pvalues_II["SFE , SBE",]))
+print(paste("SFT-SBT :", all_pvalues_II["SFT , SBT",]))
+
+# question 3 
+print(paste("RFI-RFE :", all_pvalues_II["RFI , RFE",]))
+print(paste("RBI-RBE :", all_pvalues_II["RBI , RBE",]))
+print(paste("SFI-SFE :", all_pvalues_II["SFI , SFE",]))
+print(paste("SBI-SBE :", all_pvalues_II["SBI , SBE",]))
+
+print(paste("RFI-RFT :", all_pvalues_II["RFI , RFT",]))
+print(paste("RBI-RBT :", all_pvalues_II["RBI , RBT",]))
+print(paste("SFI-SFT :", all_pvalues_II["SFI , SFT",]))
+print(paste("SBI-SBT :", all_pvalues_II["SBI , SBT",]))
+
+print(paste("RFT-RFE :", all_pvalues_II["RFT , RFE",]))
+print(paste("RBT-RBE :", all_pvalues_II["RBT , RBE",]))
+print(paste("SFT-SFE :", all_pvalues_II["SFT , SFE",]))
+print(paste("SBT-SBE :", all_pvalues_II["SBT , SBE",]))
+
 
 # ============================== TEST VARIABLE NEIGHBOURHOOD DESCENT ====================================
 # ==============================================================================================
@@ -115,9 +122,15 @@ all_pvalues_VND <- new.allCombiPvalues(algo_names_VND, 12, best.knowns, myfileVN
 print(all_pvalues_VND)
 
 # print all best pvalues (above alpha = 0.05), which means pairs of similar algorithms
-new.printBestPvalues(all_pvalues_VND) 
+new.printBestPvalues(all_pvalues_VND, 0.01) 
 
 # write pvalues to file
 write.table(all_pvalues_VND, file="pvalues_VND.txt", sep="\t", col.names = F, row.names = F)
 
-print(6.42787532422003e-49 > 0.05)
+# pvalues comparisons : 
+print(paste("RTEI-RTIE :", all_pvalues_VND["RTEI , RTIE",]))
+print(paste("RTEI-STEI :", all_pvalues_VND["RTEI , STEI",]))
+print(paste("RTEI-STIE :", all_pvalues_VND["RTEI , STIE",]))
+print(paste("RTIE-STEI :", all_pvalues_VND["RTIE , STEI",]))
+print(paste("RTIE-STIE :", all_pvalues_VND["RTIE , STIE",]))
+print(paste("STEI-STIE :", all_pvalues_VND["STEI , STIE",]))

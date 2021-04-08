@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
 //    cout << best_knowns << endl;
 
 //    testSmallInstance();
-    testMediumInstance(best_knowns);
+//    testMediumInstance(best_knowns);
 //    testBigInstance(best_knowns);
 
     // ======================================================
@@ -542,6 +542,9 @@ int main(int argc, char *argv[])
     vector<string> filenamesVND_avg = {UFILE_VND_AVG_RPDS, UFILE_VND_AVG_CTS};
     writeAlgosStatsToFile(filenamesVND_avg[0], avg_RPDs_VND, header_vnd);
     writeAlgosStatsToFile(filenamesVND_avg[1], avg_CTs_VND, header_vnd);
+
+    // TODO : pour VND, faire le percentage improvement
+    // TODO : >> comparer RTEI,RTIE,STEI,STIE avec RFE,RFI,SFE,SFI
 
     return 0;
 }
