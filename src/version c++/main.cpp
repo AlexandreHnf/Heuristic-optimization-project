@@ -81,7 +81,8 @@ void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header
 
         string line;
 		int global_index = 0;
-		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+//		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
+		for (int inst_nb_index = 1; inst_nb_index >= 0; inst_nb_index--) { // 0 = instances 50, 1 = instances 100
 			for (int i = 0; i < 30; i++) {
 				
 				line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
@@ -233,10 +234,10 @@ void IItestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_CT
 
     cout << "END ========================= " << endl;
     cout << "All II instances done in " << timing << "sec" << endl;
-//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 /***************************************************************************/
@@ -263,8 +264,8 @@ void testAllAlgosVND(PfspInstance instance, vdouble &computation_times, vdouble 
     for (int s = 0; s < 2; s++) { // starting modes (Random or SRZ)
         for (int n = 1; n < 3; n++) { // neighbourhoods sets (neighbourhoods 1, neighbourhoods 2)
             auto start_alg_time = chrono::steady_clock::now();
-            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
-                 modes[n][1] << "-" << modes[n][2] << endl;
+//            cout << "ALGO " << modes[0][s] << "-" << modes[n][0] << "-" <<
+//                 modes[n][1] << "-" << modes[n][2] << endl;
             solution = variableNeighbourhoodDescent(modes[n], instance, init_sols[s]);
             all_wcts[inst_nb].push_back(solution.wct); // save wct of the algo on this instance
 //            printSol(solution);
@@ -320,19 +321,22 @@ void VNDtestAllInstances(vvint & all_wcts, vvdouble & all_rpds, vvdouble & avg_C
 
     cout << "END ========================= " << endl;
     cout << "All VND instances done in " << timing << "sec" << endl;
-//    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
-//    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
-//    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
-//    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
+    cout << "average CT 50 jobs : " << avg_CTs[0] << endl;
+    cout << "average CT 100 jobs : " << avg_CTs[1] << endl;
+    cout << "average RPD 50 jobs : " << avg_RPDs[0] << endl;
+    cout << "average RPD 100 jobs : " << avg_RPDs[1] << endl;
 }
 
 
 vvdouble VNDpercentageImprovement(vvdouble avg_RPDs_VND, vvdouble avg_RPDs, vector<int> single_neighbour_indices) {
-    vvdouble PI_VND = avg_RPDs_VND;
+    vvdouble PI_VND = {vdouble(4), vdouble(4)};
     for (int i = 0; i < avg_RPDs.size(); i++) { // job nb
         for (int j = 0; j < avg_RPDs_VND[0].size(); j++) { // VND algos
             // relativePercentageDeviation(wct, best_known) => between relative percentage deviations
-            PI_VND[i][j] = relativePercentageDeviation(avg_RPDs_VND[i][j], avg_RPDs[i][single_neighbour_indices[j]]);
+            // if positive, then there is an improvement of VND over II for the given neighbourhood rule (insert or exchange)
+            double a = avg_RPDs[i][single_neighbour_indices[j]];
+            double b = avg_RPDs_VND[i][j];
+            PI_VND[i][j] = 100*((a-b)/b); // relative percentage deviation
         }
     }
     return PI_VND;
@@ -455,12 +459,25 @@ int main(int argc, char *argv[]) {
     # pivoting rule : --bestImprovement (BI), --firstImprovement (FI)
      */
 
-    /* initialize random seed: */
-//    srand ( time(NULL) );
-//     srand(0);
+//    processArgv(argc, argv);
 
-    processArgv(argc, argv);
 
+    //                       RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI
+    // average RPD 50 jobs : 31.289, 2.00721, 1.60013, 32.2462, 3.89111, 2.52801, 3.64523, 2.72901, 1.714, 3.6549, 2.75127, 2.01391,
+    // average RPD 100 jobs : 41.2289, 1.72973, 1.9436, 42.2496, 4.90467, 3.78795, 4.58381, 3.20438, 2.12647, 4.58994, 3.51955, 2.52972,
+    vvdouble avg_rpds_II = {{31.289, 2.00721, 1.60013, 32.2462, 3.89111, 2.52801, 3.64523, 2.72901, 1.714, 3.6549, 2.75127, 2.01391},
+                            {41.2289, 1.72973, 1.9436, 42.2496, 4.90467, 3.78795, 4.58381, 3.20438, 2.12647, 4.58994, 3.51955, 2.52972}};
+    //                       RTEI,RTIE,STEI,STIE
+    // average RPD 50 jobs : 1.64959, 1.93493, 1.87812, 1.91929,
+    // average RPD 100 jobs : 1.88406, 2.43476, 2.22576, 2.19636,
+    vvdouble avg_rpds_VND = {{1.64959, 1.93493, 1.87812, 1.91929}, {1.88406, 2.43476, 2.22576, 2.19636}};
+
+    // compare RTEI,RTIE,STEI,STIE with RFE,RFI,SFE,SFI
+    vvdouble PI_VND = VNDpercentageImprovement(avg_rpds_VND, avg_rpds_II, {1, 2, 7, 8});
+    cout << PI_VND << endl;
+
+
+    //
     // =====================================================
     return 0;
 }

@@ -87,7 +87,7 @@ Solution getBestSubset(int size, int job, vInt start, PfspInstance instance) {
 //        printVector(subset, "subset : ");
 //        cout << "=> " << temp_wct << endl;
 
-        if (temp_wct <= best_subset.wct) {
+        if (temp_wct < best_subset.wct) {
             best_subset.sol = subset;
             best_subset.wct = temp_wct;
         }
@@ -283,6 +283,7 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
         Solution neighbour = chooseNeighbour(best_sol, instance, neighbourhood_modes[i], "FI");
         if (isLocalOptimal(neighbour)) { // if no existing improving solution
             i++;
+//            cout << "no improving" << endl;
         } else {
             best_sol = neighbour;
 //            cout << "it " << it << " | ";
@@ -290,8 +291,9 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
             i = 0;
             it++;
         }
-        stop = i > neighbourhood_modes.size() - 1;
+        stop = i > neighbourhood_modes.size()-1;
     }
+//    cout << "nb it vnd : "<< it << endl;
     return best_sol;
 }
 
