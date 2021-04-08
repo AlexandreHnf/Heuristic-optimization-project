@@ -76,7 +76,7 @@ print(all_pvalues_II)
 new.printBestPvalues(all_pvalues_II, 0.01) 
 
 # write pvalues to file
-write.table(all_pvalues_II, file="pvalues_II.txt", sep="\t", col.names = F, row.names = rownames(all_pvalues_II))
+write.table(all_pvalues_II, file="pvalues_II.csv", sep=",", col.names = F, row.names = rownames(all_pvalues_II))
 
 # question 1
 print(paste("RFI-SFI :", all_pvalues_II["RFI , SFI",]))
@@ -126,7 +126,7 @@ print(all_pvalues_VND)
 new.printBestPvalues(all_pvalues_VND, 0.01) 
 
 # write pvalues to file
-write.table(all_pvalues_VND, file="pvalues_VND.txt", sep="\t", col.names = F, row.names = rownames(all_pvalues_VND))
+write.table(all_pvalues_VND, file="pvalues_VND.csv", sep=",", col.names = F, row.names = rownames(all_pvalues_VND))
 
 # pvalues comparisons : 
 print(paste("RTEI-RTIE :", all_pvalues_VND["RTEI , RTIE",]))

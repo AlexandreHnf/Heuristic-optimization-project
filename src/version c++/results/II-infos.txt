@@ -57,3 +57,19 @@ II :
 
 RPD :   
 	20.3 -16  45   -10
+
+================================
+
+VND pvalues :
+
+RTEI, RTIE, STEI, STIE
+
+Question 1 : 
+RTEI - RTIE
+RTEI - STEI
+RTEI - STIE
+
+RTIE - STEI
+RTIE - STIE
+
+STEI - STIE
