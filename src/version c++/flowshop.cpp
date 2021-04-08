@@ -2,26 +2,6 @@
 // Created by Alexandre on 0026 26 mars 2021.
 //
 
-/***************************************************************************
- *   Copyright (C) 2012 by Jérémie Dubois-Lacoste   *
- *   jeremie.dl@gmail.com   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
@@ -107,7 +87,7 @@ Solution getBestSubset(int size, int job, vInt start, PfspInstance instance) {
 //        printVector(subset, "subset : ");
 //        cout << "=> " << temp_wct << endl;
 
-        if (temp_wct <= best_subset.wct) {
+        if (temp_wct < best_subset.wct) {
             best_subset.sol = subset;
             best_subset.wct = temp_wct;
         }
@@ -202,8 +182,6 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
                                                                   and inserting it at another position
     ex : [A,B,C,D,E,F]
                  =>   [A,C,D,B,E,F]
-
-    QUESTION : l'insertion peuut se faire en fin de liste aussi ?
     */
     Solution best_sol = {vInt(0), sol.wct};
     vInt temp_sol;
@@ -305,6 +283,7 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
         Solution neighbour = chooseNeighbour(best_sol, instance, neighbourhood_modes[i], "FI");
         if (isLocalOptimal(neighbour)) { // if no existing improving solution
             i++;
+//            cout << "no improving" << endl;
         } else {
             best_sol = neighbour;
 //            cout << "it " << it << " | ";
@@ -312,13 +291,13 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
             i = 0;
             it++;
         }
-        stop = i > neighbourhood_modes.size() - 1;
+        stop = i > neighbourhood_modes.size()-1;
     }
+//    cout << "nb it vnd : "<< it << endl;
     return best_sol;
 }
 
 vector<vInt> readBestSolFromFile(basic_string<char> filename) {
-    // TODO : must be working on ubuntu and windows with relative path
 
     bool everythingOK = true;
     double wct;
