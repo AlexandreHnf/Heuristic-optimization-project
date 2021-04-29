@@ -45,7 +45,9 @@ class PfspInstance{
 
         /* Read write privates attributs : */
         int getNbJob();
+        void setNbJob(int nJ);
         int getNbMac();
+        void setNbMac(int nM);
 
         /* Allow the memory for the processing times matrix : */
         void allowMatrixMemory(int nbJ, int nbM);

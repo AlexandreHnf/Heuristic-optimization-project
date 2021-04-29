@@ -19,8 +19,16 @@ int PfspInstance::getNbJob() {
     return nb_jobs;
 }
 
+void PfspInstance::setNbJob(int nJ) {
+    nb_jobs = nJ;
+}
+
 int PfspInstance::getNbMac() {
     return nb_mach;
+}
+
+void PfspInstance::setNbMac(int nM) {
+    nb_mach = nM;
 }
 
 

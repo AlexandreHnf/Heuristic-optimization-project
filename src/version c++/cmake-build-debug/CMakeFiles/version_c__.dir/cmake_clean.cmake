@@ -1,8 +1,10 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/version_c__.dir/flowshop.cpp.o"
-  "CMakeFiles/version_c__.dir/main.cpp.o"
-  "CMakeFiles/version_c__.dir/pfspinstance.cpp.o"
-  "version_c__"
+  "CMakeFiles/version_c__.dir/flowshop.cpp.obj"
+  "CMakeFiles/version_c__.dir/main.cpp.obj"
+  "CMakeFiles/version_c__.dir/pfspinstance.cpp.obj"
+  "libversion_c__.dll.a"
+  "version_c__.exe"
+  "version_c__.exe.manifest"
   "version_c__.pdb"
 )
 
