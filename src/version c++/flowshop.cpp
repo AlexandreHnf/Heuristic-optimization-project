@@ -1,7 +1,6 @@
 //
-// Created by Alexandre on 0026 26 mars 2021.
+// Created by Alexandre HENEFFE on 0026 26 mars 2021.
 //
-
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
@@ -34,7 +33,6 @@ std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
 }
 
 void printSol(Solution s) {
-//    printVector(s.sol, "jobs : ");
     cout << s.sol << endl;
     cout << "wct : " << s.wct << endl;
 }
@@ -67,11 +65,9 @@ vInt getInitSRZsol(PfspInstance instance) {
     }
 
     vInt init_sol(0);
-    // begin() returns to the first value of multimap.
     multimap<double,int> :: iterator it;
     for (it = mymap.begin() ; it != mymap.end() ; it++) {
         init_sol.push_back((*it).second);
-//        cout << "(" << (*it).first << ", " << (*it).second << ")" << endl;
     }
     return init_sol;
 }
@@ -84,8 +80,6 @@ Solution getBestSubset(int size, int job, vInt start, PfspInstance instance) {
         auto it = subset.begin();
         it = subset.insert ( it+i, job ); // insert job to position i
         int temp_wct = instance.computeWCT(subset);
-//        printVector(subset, "subset : ");
-//        cout << "=> " << temp_wct << endl;
 
         if (temp_wct < best_subset.wct) {
             best_subset.sol = subset;
@@ -104,11 +98,9 @@ Solution simplifiedRZheuristic(PfspInstance instance) {
 	Then, construct the solution by inserting one job at a time in the position that minimize the WCT
     */
     vInt starting_sequence = getInitSRZsol(instance);
-//    printVector(starting_sequence, "starting sequence : ");
     Solution best_sol = {vInt(0), static_cast<long>(10000000000)};
     for (int j = 0; j < instance.getNbJob(); j++) {
         Solution best_subset = getBestSubset(j+1, starting_sequence[j], best_sol.sol, instance);
-//        printSol(best_subset);
         best_sol.sol = best_subset.sol;
         best_sol.wct = best_subset.wct;
     }
@@ -131,7 +123,6 @@ Solution getBestTransposeNeighbour(Solution sol, PfspInstance instance, string p
     for (int i = 0; i < sol.sol.size()-1; i++) {
         temp_sol = sol.sol;
         iter_swap(temp_sol.begin() + i, temp_sol.begin() + i+1);
-//        printVector(temp_sol, "");
         int wct = instance.computeWCT(temp_sol);
         if (wct < best_sol.wct) {
             best_sol.sol = temp_sol;
@@ -160,7 +151,6 @@ Solution getBestExchangeNeighbour(Solution sol, PfspInstance instance, string pi
             if (i != j) {
                 temp_sol = sol.sol;
                 iter_swap(temp_sol.begin() + i, temp_sol.begin() + j);
-//                printVector(temp_sol, "");
                 int wct = instance.computeWCT(temp_sol);
                 if (wct < best_sol.wct) {
                     best_sol.sol = temp_sol;
@@ -197,7 +187,6 @@ Solution getBestInsertionNeighbour(Solution sol, PfspInstance instance, string p
                 } else {
                     temp_sol.erase(temp_sol.begin()+i); // remove the ith element of the list
                 }
-//                printVector(temp_sol, "");
                 int wct = instance.computeWCT(temp_sol);
                 if (wct < best_sol.wct) {
                     best_sol.sol = temp_sol;
@@ -279,21 +268,16 @@ Solution variableNeighbourhoodDescent(vector<string> neighbourhood_modes, PfspIn
     bool stop = false;
     Solution best_sol = init_sol;
     while (not stop) { // "do while"
-//        cout << "neighbourhood mode : " << neighbourhood_modes[i] << endl;
         Solution neighbour = chooseNeighbour(best_sol, instance, neighbourhood_modes[i], "FI");
         if (isLocalOptimal(neighbour)) { // if no existing improving solution
             i++;
-//            cout << "no improving" << endl;
         } else {
             best_sol = neighbour;
-//            cout << "it " << it << " | ";
-//            printSol(best_sol);
             i = 0;
             it++;
         }
         stop = i > neighbourhood_modes.size()-1;
     }
-//    cout << "nb it vnd : "<< it << endl;
     return best_sol;
 }
 
@@ -314,7 +298,6 @@ vector<vInt> readBestSolFromFile(basic_string<char> filename) {
                 fileIn >> str; // The instance name, not important !
                 fileIn >> str; // "," not important
                 fileIn >> wct; // best solution wct
-//                cout << wct << endl;
                 best_solutions[i].push_back( (int) wct);
             }
         }

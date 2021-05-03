@@ -11,6 +11,7 @@ CMakeFiles/version_c__.dir/main.cpp.obj: ../experimentsAssignment2.h
 CMakeFiles/version_c__.dir/main.cpp.obj: ../flowshop.h
 CMakeFiles/version_c__.dir/main.cpp.obj: ../main.cpp
 CMakeFiles/version_c__.dir/main.cpp.obj: ../pfspinstance.h
+CMakeFiles/version_c__.dir/main.cpp.obj: ../tabu.h
 
 CMakeFiles/version_c__.dir/pfspinstance.cpp.obj: ../pfspinstance.cpp
 CMakeFiles/version_c__.dir/pfspinstance.cpp.obj: ../pfspinstance.h

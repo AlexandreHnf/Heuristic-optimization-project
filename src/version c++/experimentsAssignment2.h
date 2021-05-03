@@ -13,6 +13,7 @@
 #include "pfspinstance.h"
 #include "flowshop.h"
 #include "MemeticGA.h"
+#include "tabu.h"
 
 void printPopulation(Population pop) {
     for (auto p : pop) {
@@ -74,6 +75,28 @@ void testRandom() {
     cout << getRandomIndex(0,10, -1) << endl;
 }
 
+void testMGASmallInstance(float Pe, float Pc, float Pm, int COUNT) {
+    PfspInstance instance_small;
+
+    string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
+    if (! instance_small.readDataFromFile(filename_small) )
+        return;
+    cout << "ok parse" << endl;
+    Solution bs = memeticGeneticAlgo(instance_small, 5, Pe, Pc, Pm, COUNT);
+    printSol(bs);
+}
+
+void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT) {
+    PfspInstance instance_medium;
+
+    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    if (! instance_medium.readDataFromFile(filename_medium) )
+        return;
+    cout << "ok parse" << endl;
+    Solution bs = memeticGeneticAlgo(instance_medium, 5, Pe, Pc, Pm, COUNT);
+    printSol(bs);
+}
+
 void testMGA() {
     PfspInstance instance;
     instance.setNbJob(5);
@@ -96,19 +119,29 @@ void testMGA() {
     float Pm = 0.5;
     float Pc = 1.0;
     float Pe = 0.6;
-    int COUNT = 10;
+    int COUNT = 100;
 
 //    testRandom();
+//    testMGASmallInstance(Pe, Pc, Pm, COUNT);
+    testMGAmediumInstance(Pe, Pc, Pm, COUNT);
 
-    PfspInstance instance_small;
 
-    string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
-    if (! instance_small.readDataFromFile(filename_small) )
+}
+
+void testTabuMedium() {
+    PfspInstance instance_medium;
+
+    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;
-    Solution bs = memeticGeneticAlgo(instance_small, 5, Pe, Pc, Pm, COUNT);
+    Solution bs = tabuSearch(instance_medium, 7);
     printSol(bs);
+}
 
+void testTabu() {
+
+    testTabuMedium();
 }
 
 #endif //VERSION_C___EXPERIMENTSASSIGNMENT2_H

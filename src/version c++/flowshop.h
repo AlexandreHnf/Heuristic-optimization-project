@@ -1,5 +1,5 @@
 //
-// Created by Alexandre on 0026 26 mars 2021.
+// Created by Alexandre HENEFFE on 0026 26 mars 2021.
 //
 
 #ifndef VERSION_C___FLOWSHOP_H
