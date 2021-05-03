@@ -128,6 +128,20 @@ void testMGA() {
 
 }
 
+// ==================================================================
+// =================== TEST TABU ====================
+
+void testTabuSmall() {
+    PfspInstance instance_small;
+
+    string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
+    if (! instance_small.readDataFromFile(filename_small) )
+        return;
+    cout << "ok parse" << endl;
+    Solution bs = tabuSearch(instance_small, 7);
+    printSol(bs);
+}
+
 void testTabuMedium() {
     PfspInstance instance_medium;
 
@@ -139,8 +153,27 @@ void testTabuMedium() {
     printSol(bs);
 }
 
+void testTabuInsert() {
+    vInt pi = {1,2,3,4,5};
+    for (int a = 0; a < 5; a++) {
+        for (int b = 0; b < 5; b++) {
+            if (a != b) {
+                vInt tmp = pi;
+                if (a < b)
+                    insertRight(a, b, tmp);
+                if (a > b)
+                    insertLeft(a, b, tmp);
+                cout << a << "," << b << endl;
+                printVector(tmp, "");
+            }
+        }
+    }
+}
+
 void testTabu() {
 
+//    testTabuInsert();
+//    testTabuSmall();
     testTabuMedium();
 }
 
