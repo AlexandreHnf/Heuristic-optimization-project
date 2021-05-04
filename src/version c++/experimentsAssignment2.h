@@ -65,35 +65,26 @@ void testCrossover(PfspInstance instance, Solution p1, Solution p2) {
     printSol(daughter);
 }
 
-void testRandom() {
-    //    srand( (unsigned)time( NULL ) );
-//    std::srand(std::time(nullptr));
-    std::srand(std::time(nullptr));
-    float r = ((double) rand() / (RAND_MAX));
-    cout << r << endl;
-//    cout << getRandom01() << endl;
-    cout << getRandomIndex(0,10, -1) << endl;
-}
-
-void testMGASmallInstance(float Pe, float Pc, float Pm, int COUNT) {
+void testMGASmallInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
     PfspInstance instance_small;
 
     string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
     if (! instance_small.readDataFromFile(filename_small) )
         return;
     cout << "ok parse" << endl;
-    Solution bs = memeticGeneticAlgo(instance_small, 5, Pe, Pc, Pm, COUNT);
+    Solution bs = memeticGeneticAlgo(instance_small, pop_size, Pe, Pc, Pm, COUNT);
     printSol(bs);
 }
 
-void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT) {
+void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
     PfspInstance instance_medium;
 
-    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    string filename_medium = "instances/50_20_03";
     if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;
-    Solution bs = memeticGeneticAlgo(instance_medium, 5, Pe, Pc, Pm, COUNT);
+    Solution bs = memeticGeneticAlgo(instance_medium, pop_size, Pe, Pc, Pm, COUNT);
     printSol(bs);
 }
 
@@ -118,12 +109,13 @@ void testMGA() {
 
     float Pm = 0.5;
     float Pc = 1.0;
-    float Pe = 0.6;
-    int COUNT = 100;
+    float Pe = 0.4;
+    int COUNT = 5;
+    int pop_size = 50;
 
 //    testRandom();
 //    testMGASmallInstance(Pe, Pc, Pm, COUNT);
-    testMGAmediumInstance(Pe, Pc, Pm, COUNT);
+    testMGAmediumInstance(Pe, Pc, Pm, COUNT, pop_size);
 
 
 }
@@ -145,7 +137,8 @@ void testTabuSmall(int tabu_tenure) {
 void testTabuMedium(int tabu_tenure) {
     PfspInstance instance_medium;
 
-    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_03";
+    string filename_medium = "instances/50_20_03";
     if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;

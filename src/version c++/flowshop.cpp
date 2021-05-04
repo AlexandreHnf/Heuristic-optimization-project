@@ -26,7 +26,7 @@ void printVector(vInt v, string message) {
 template <typename T>
 std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
 {
-    for(auto elem : vec) {
+    for(T elem : vec) {
         os << elem << ", ";
     }
     return os;

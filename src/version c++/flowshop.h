@@ -39,6 +39,6 @@ Solution variableNeighbourhoodDescent(std::vector<std::string> neighbourhood_mod
 // For tests
 //double averageRelativePercentageDev()
 
-std::vector<std::vector<int>> readBestSolFromFile(std::basic_string<char> filename);
+std::vector<std::vector<int> > readBestSolFromFile(std::basic_string<char> filename);
 
 #endif //VERSION_C___FLOWSHOP_H
