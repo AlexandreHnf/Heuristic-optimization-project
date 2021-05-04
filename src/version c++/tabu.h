@@ -20,6 +20,9 @@ typedef vector<int> vInt;
 typedef vector<vector<int>> vvInt;
 typedef vector<Solution> vSol;
 
+float getRand01() {
+    return ((double) rand() / (RAND_MAX));
+}
 
 void insertRight(int a, int b, vInt &temp_sol) {
     int to_insert = temp_sol[a];
@@ -92,7 +95,7 @@ void evaluateNeighbour(int wct, vSol &best_neighs, vvInt &best_moves, vInt move,
     }
     // if no improving neighbour, then we take worsening step to
     // escape from local optimum
-    if (wct > best_neighs[1].wct) {
+    if (wct > best_neighs[1].wct and getRand01() < 0.2) {
         best_neighs[1].sol = temp_sol;
         best_neighs[1].wct = wct;
         best_moves[1] = move;
@@ -150,8 +153,14 @@ Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu
     return best_neighs[chosen_neigh];
 }
 
-bool terminationCriterion(int it) {
-    return it >= 500;
+bool terminationCriterion(int it, chrono::steady_clock::time_point start_time, double max_time) {
+    auto now = chrono::steady_clock::now();
+    double timing = chrono::duration <double> (now-start_time).count();
+    if (timing >= max_time)
+        return true;
+
+//    return it >= 1000;
+    return false;
 }
 
 void printTL(vvInt tabu_list) {
@@ -171,14 +180,14 @@ vvInt initTabuMatrix(PfspInstance instance) {
     return tabu_matrix;
 }
 
-Solution tabuSearch(PfspInstance instance, int max_tabu_size) {
+Solution tabuSearch(PfspInstance instance, int max_tabu_size, chrono::steady_clock::time_point start_time, double max_time) {
     Solution init_sol = generateRndSol(instance);
 //    Solution init_sol = simplifiedRZheuristic(instance);
     Solution best_sol = init_sol;
     vvInt tabu_mat = initTabuMatrix(instance);
     Solution best_candidate = init_sol;
     int it = 0;
-    while (! terminationCriterion(it)) {
+    while (! terminationCriterion(it, start_time, max_time)) {
         cout << "it " << it << ", B : " << best_sol.wct;
         it++;
         best_candidate = getBestNeighbour(instance, best_candidate, tabu_mat, best_sol.wct, max_tabu_size);

@@ -91,7 +91,7 @@ void evaluateNeighbour(int wct, vSol &best_neighs, vvInt &best_moves, vInt move,
     }
     // if no improving neighbour, then we take worsening step to
     // escape from local optimum
-    if (wct > best_neighs[1].wct) {
+    if (wct > best_neighs[1].wct and getRandom01() < 0.2) {
         best_neighs[1].sol = temp_sol;
         best_neighs[1].wct = wct;
         best_moves[1] = move;

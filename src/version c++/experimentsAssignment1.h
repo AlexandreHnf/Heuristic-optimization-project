@@ -62,7 +62,7 @@ std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
 /***************************************************************************/
 
 string getInstanceName(int i, int j) {
-    // i = represent wheter it is a instance with 50 or 100 jobs
+    // i = represents instance with 50 or 100 jobs
     // j = the instance number
     string instance_name = "";
     if (i == 0) {

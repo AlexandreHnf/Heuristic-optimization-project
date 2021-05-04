@@ -13,7 +13,7 @@
 #include "pfspinstance.h"
 #include "flowshop.h"
 #include "MemeticGA.h"
-#include "tabu2.h"
+#include "tabu.h"
 
 void printPopulation(Population pop) {
     for (auto p : pop) {
@@ -65,30 +65,7 @@ void testCrossover(PfspInstance instance, Solution p1, Solution p2) {
     printSol(daughter);
 }
 
-void testMGASmallInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
-    PfspInstance instance_small;
-
-    string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
-    if (! instance_small.readDataFromFile(filename_small) )
-        return;
-    cout << "ok parse" << endl;
-    Solution bs = memeticGeneticAlgo(instance_small, pop_size, Pe, Pc, Pm, COUNT);
-    printSol(bs);
-}
-
-void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
-    PfspInstance instance_medium;
-
-//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
-    string filename_medium = "instances/50_20_02";
-    if (! instance_medium.readDataFromFile(filename_medium) )
-        return;
-    cout << "ok parse" << endl;
-    Solution bs = memeticGeneticAlgo(instance_medium, pop_size, Pe, Pc, Pm, COUNT);
-    printSol(bs);
-}
-
-void testMGA() {
+void unitTestsMGA() {
     PfspInstance instance;
     instance.setNbJob(5);
     instance.setNbMac(5);
@@ -101,11 +78,42 @@ void testMGA() {
     Solution p5 = {{4,1,2,3,5}, 24};
     Population pop = {p1, p2, p3, p4, p5};
 
-//    testSorted(pop);
-//    testEliteSelection(pop);
-//    testGetAC(instance);
-//    testWSMGS(instance, pop)
-//    testCrossover(instance, p1, p3);
+    testSorted(pop);
+    testEliteSelection(pop);
+    testGetAC(instance);
+    testWSMGS(instance, pop);
+    testCrossover(instance, p1, p3);
+}
+
+void testMGASmallInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
+    PfspInstance instance_small;
+
+    string filename_small = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\05_03_01.txt";
+    if (! instance_small.readDataFromFile(filename_small) )
+        return;
+    cout << "ok parse" << endl;
+    auto start_alg_time = chrono::steady_clock::now();
+    Solution bs = memeticGeneticAlgo(instance_small, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, 42.5);
+    cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
+    printSol(bs);
+}
+
+void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size) {
+    PfspInstance instance_medium;
+
+//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    string filename_medium = "instances/50_20_01";
+    if (! instance_medium.readDataFromFile(filename_medium) )
+        return;
+    cout << "ok parse" << endl;
+    auto start_alg_time = chrono::steady_clock::now();
+    Solution bs = memeticGeneticAlgo(instance_medium, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, 42.5);
+    cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
+    printSol(bs);
+}
+
+void testMGA() {
+//    unitTestsMGA();
 
     float Pm = 0.5;
     float Pc = 1.0;
@@ -113,10 +121,8 @@ void testMGA() {
     int COUNT = 10;
     int pop_size = 50;
 
-//    testRandom();
 //    testMGASmallInstance(Pe, Pc, Pm, COUNT);
     testMGAmediumInstance(Pe, Pc, Pm, COUNT, pop_size);
-
 
 }
 
@@ -130,19 +136,23 @@ void testTabuSmall(int tabu_tenure) {
     if (! instance_small.readDataFromFile(filename_small) )
         return;
     cout << "ok parse" << endl;
-    Solution bs = tabuSearch(instance_small, tabu_tenure);
+    auto start_alg_time = chrono::steady_clock::now();
+    Solution bs = tabuSearch(instance_small, tabu_tenure, start_alg_time, 42.5);
+    cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
 
 void testTabuMedium(int tabu_tenure) {
     PfspInstance instance_medium;
 
-    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
-//    string filename_medium = "instances/50_20_01";
+//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+    string filename_medium = "instances/50_20_01";
     if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;
-    Solution bs = tabuSearch(instance_medium, tabu_tenure);
+    auto start_alg_time = chrono::steady_clock::now();
+    Solution bs = tabuSearch(instance_medium, tabu_tenure, start_alg_time, 42.5);
+    cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
 
