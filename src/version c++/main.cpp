@@ -27,9 +27,9 @@ int main(int argc, char *argv[]) {
     srand ( time(NULL) );
 //     testRandom();
 
-    testMGA();
+//    testMGA();
 
-//    testTabu();
+    testTabu();
 
 
 

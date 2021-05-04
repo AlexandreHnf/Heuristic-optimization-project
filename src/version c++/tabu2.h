@@ -35,28 +35,32 @@ void insertLeft(int a, int b, vInt &temp_sol) {
     temp_sol.erase(temp_sol.begin()+a+1); // remove the (i+1)th element of the list
 }
 
-bool isTabu(int a, int b, vInt currsol, vvInt tabu_mat) {
+bool isTabu(int a, int b, vInt currsol, vvInt tabu_list, vInt move) {
     if (a < b) {
         for (int k=a+1; k <= b; k++) {
-            // (pi(j), pi(a)), j = a+1 ,..., b
-            if (tabu_mat[currsol[k]][currsol[a]] > 0) {
-                return true;
+            for (auto pair: tabu_list) {
+                // (pi(j), pi(a)), j = a+1 ,..., b
+                if (pair[0] == currsol[k] and pair[1] == currsol[a]) {
+                    return true;
+                }
             }
         }
 
     } else if (a > b) {
         for (int k=b; k <= a-1; k++) {
-            // (pi(a), pi(j)), j = b ,..., a-1
-            if (tabu_mat[currsol[a]][currsol[k]] > 0) {
-                return true;
+            for (auto pair: tabu_list) {
+                // (pi(a), pi(j)), j = b ,..., a-1
+                if (pair[0] == currsol[a] and pair[1] == currsol[k]) {
+                    return true;
+                }
             }
         }
     }
     return false;
 }
 
-bool aspirationCriterion(int a, int b, vInt candidate_sol, vvInt tabu_mat, int wct, int best_wct) {
-    bool is_tabu = isTabu(a, b, candidate_sol, tabu_mat);
+bool aspirationCriterion(int a, int b, vInt candidate_sol, vvInt tabu_list, vInt move, int wct, int best_wct) {
+    bool is_tabu = isTabu(a, b, candidate_sol, tabu_list, move);
 
     if (! is_tabu) {
         return true;
@@ -68,19 +72,14 @@ bool aspirationCriterion(int a, int b, vInt candidate_sol, vvInt tabu_mat, int w
     return false;  // if tabu
 }
 
-void updateTabuList(vvInt &tabu_mat, int max_tabu_size, vInt best_move) {
+void updateTabuList(vvInt &tabu_list, int max_tabu_size, vInt best_move) {
     // update tabu list
+    if (best_move.size() == 0)
+        best_move = {-1, -1};  // add not significant move (to preserve order)
 
-    if (best_move[0] != -1 and best_move[1] != -1)
-        tabu_mat[best_move[0]][best_move[1]] = max_tabu_size;
-
-    // decrease tabu status
-    for (int i = 0; i < tabu_mat.size(); i++) {
-        for (int j = 0; j < tabu_mat.size(); j++) {
-            if (tabu_mat[i][j] > 0) {
-                tabu_mat[i][j]--;
-            }
-        }
+    tabu_list.push_back(best_move); // add new best move to tabu list
+    if (tabu_list.size() > max_tabu_size) {
+        tabu_list.erase(tabu_list.begin()+0); // pop front
     }
 }
 
@@ -119,7 +118,7 @@ int chooseBestNeighbour(vSol best_neighs, vvInt best_moves) {
     }
 }
 
-Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu_mat, int best_wct, int max_tabu_size) {
+Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu_list, int best_wct, int max_tabu_size) {
 //    vSol best_neighs = {{vInt(0), candidate.wct}, {vInt(0), std::numeric_limits<int>::max()}};
     vSol best_neighs = {{vInt(0), candidate.wct}, {vInt(0), 0}};
     vvInt best_moves(2);
@@ -130,13 +129,13 @@ Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu
     // test all the pairs of positions
     for (int a = 0; a < candidate.sol.size(); a++) {
         for (int b = 0; b < candidate.sol.size(); b++) {
-            if (a != b ) {
+            if (a != b ) { // and b != a+1
                 temp_sol = candidate.sol;
                 move = getMove(candidate.sol, a, b, temp_sol);
 
                 int wct = instance.computeWCT(temp_sol);
                 // aspiration criterion : if tabu but better than best, then still taken
-                if (aspirationCriterion(a, b, candidate.sol, tabu_mat, wct, best_wct)) {
+                if (aspirationCriterion(a, b, candidate.sol, tabu_list, move, wct, best_wct)) {
                     evaluateNeighbour(wct, best_neighs, best_moves, move, temp_sol);
                     nb_accepted++;
                 }
@@ -146,12 +145,12 @@ Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu
     }
 //    cout << nb_accepted << "/" << tot << " accepted" << endl;
     int chosen_neigh = chooseBestNeighbour(best_neighs, best_moves);
-    updateTabuList(tabu_mat, max_tabu_size, best_moves[chosen_neigh]);
+    updateTabuList(tabu_list, max_tabu_size, best_moves[chosen_neigh]);
     return best_neighs[chosen_neigh];
 }
 
 bool terminationCriterion(int it) {
-    return it >= 500;
+    return it >= 1000;
 }
 
 void printTL(vvInt tabu_list) {
@@ -162,26 +161,18 @@ void printTL(vvInt tabu_list) {
     cout << endl;
 }
 
-vvInt initTabuMatrix(PfspInstance instance) {
-    vvInt tabu_matrix;
-    for (int i = 0; i < instance.getNbJob(); i++) {
-        vInt lign(instance.getNbJob(), 0);
-        tabu_matrix.push_back(lign);
-    }
-    return tabu_matrix;
-}
-
 Solution tabuSearch(PfspInstance instance, int max_tabu_size) {
+    cout << "tabu without opti" << endl;
     Solution init_sol = generateRndSol(instance);
 //    Solution init_sol = simplifiedRZheuristic(instance);
     Solution best_sol = init_sol;
-    vvInt tabu_mat = initTabuMatrix(instance);
+    vvInt tabu_list;
     Solution best_candidate = init_sol;
     int it = 0;
     while (! terminationCriterion(it)) {
         cout << "it " << it << ", B : " << best_sol.wct;
         it++;
-        best_candidate = getBestNeighbour(instance, best_candidate, tabu_mat, best_sol.wct, max_tabu_size);
+        best_candidate = getBestNeighbour(instance, best_candidate, tabu_list, best_sol.wct, max_tabu_size);
 //        printTL(tabu_list);
         if (best_candidate.sol.size() == 0) // if no improving neighbour
             best_candidate = best_sol;

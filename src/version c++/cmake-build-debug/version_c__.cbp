@@ -107,6 +107,9 @@
 		<Unit filename="D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/tabu.h">
 			<Option target="version_c__"/>
 		</Unit>
+		<Unit filename="D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/tabu2.h">
+			<Option target="version_c__"/>
+		</Unit>
 		<Unit filename="D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

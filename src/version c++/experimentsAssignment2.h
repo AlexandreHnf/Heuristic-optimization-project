@@ -13,7 +13,7 @@
 #include "pfspinstance.h"
 #include "flowshop.h"
 #include "MemeticGA.h"
-#include "tabu.h"
+#include "tabu2.h"
 
 void printPopulation(Population pop) {
     for (auto p : pop) {
@@ -80,7 +80,7 @@ void testMGAmediumInstance(float Pe, float Pc, float Pm, int COUNT, int pop_size
     PfspInstance instance_medium;
 
 //    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
-    string filename_medium = "instances/50_20_03";
+    string filename_medium = "instances/50_20_02";
     if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;
@@ -110,7 +110,7 @@ void testMGA() {
     float Pm = 0.5;
     float Pc = 1.0;
     float Pe = 0.4;
-    int COUNT = 5;
+    int COUNT = 10;
     int pop_size = 50;
 
 //    testRandom();
@@ -137,8 +137,8 @@ void testTabuSmall(int tabu_tenure) {
 void testTabuMedium(int tabu_tenure) {
     PfspInstance instance_medium;
 
-//    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_03";
-    string filename_medium = "instances/50_20_03";
+    string filename_medium = "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\instances\\50_20_01";
+//    string filename_medium = "instances/50_20_01";
     if (! instance_medium.readDataFromFile(filename_medium) )
         return;
     cout << "ok parse" << endl;
