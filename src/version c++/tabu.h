@@ -163,14 +163,6 @@ bool terminationCriterion(int it, chrono::steady_clock::time_point start_time, d
     return false;
 }
 
-void printTL(vvInt tabu_list) {
-    cout << "TABUs: ";
-    for (auto pair: tabu_list) {
-        cout << "(" << pair[0] << "," << pair[1] << "), ";
-    }
-    cout << endl;
-}
-
 vvInt initTabuMatrix(PfspInstance instance) {
     vvInt tabu_matrix;
     for (int i = 0; i < instance.getNbJob(); i++) {
@@ -182,19 +174,17 @@ vvInt initTabuMatrix(PfspInstance instance) {
 
 Solution tabuSearch(PfspInstance instance, int max_tabu_size, chrono::steady_clock::time_point start_time, double max_time) {
     Solution init_sol = generateRndSol(instance);
-//    Solution init_sol = simplifiedRZheuristic(instance);
     Solution best_sol = init_sol;
     vvInt tabu_mat = initTabuMatrix(instance);
     Solution best_candidate = init_sol;
     int it = 0;
     while (! terminationCriterion(it, start_time, max_time)) {
-        cout << "it " << it << ", B : " << best_sol.wct;
+//        cout << "it " << it << ", B : " << best_sol.wct;
         it++;
         best_candidate = getBestNeighbour(instance, best_candidate, tabu_mat, best_sol.wct, max_tabu_size);
-//        printTL(tabu_list);
         if (best_candidate.sol.size() == 0) // if no improving neighbour
             best_candidate = best_sol;
-        cout << " C : " << best_candidate.wct << endl;
+//        cout << " C : " << best_candidate.wct << endl;
 
         if (best_candidate.wct < best_sol.wct) {
             best_sol = best_candidate;

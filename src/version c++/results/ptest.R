@@ -54,7 +54,7 @@ new.printBestPvalues<- function(all_pvalues, alpha) {
 
 # ================================ TEST pvalues ==============================================
 # ==============================================================================================
-best.known <- read.csv("bestSolutions.txt", header=TRUE)
+best.known <- read.csv("bestSolutionsInv.txt", header=TRUE)
 myfile <- read.table("II_WCT_test_inv.txt", header=TRUE, sep=",")
 p <- new.getPvalues("RFI", "SFI", best_knowns, myfile)
 print(p[1])

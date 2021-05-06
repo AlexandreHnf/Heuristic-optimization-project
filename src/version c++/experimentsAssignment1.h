@@ -14,78 +14,22 @@
 #include <fstream>
 #include "pfspinstance.h"
 #include "flowshop.h"
-
-// FOR WINDOWS
-#define W "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
-#define FILE_II_ALL_INST_WCT W "results\\II_WCT_test.txt"
-#define FILE_II_ALL_INST_RPD W "results\\II_RPD_test.txt"
-#define FILE_VND_ALL_INST_WCT W "results\\VND_WCT_test.txt"
-#define FILE_VND_ALL_INST_RPD W "results\\VND_RPD_test.txt"
-
-#define FILE_INSTANCES W "instances\\"
-#define FILE_INST_SMALL W "small instance\\05_03_01"
-#define FILE_BEST_KNOWN_SOLS W "instances\\bestSolutions.txt"
-#define FILE_II_AVG_RPDS W "results\\II_avgRPDs_test.txt"
-#define FILE_II_AVG_CTS W "results\\II_avgCTs_test.txt"
-#define FILE_VND_AVG_RPDS W "results\\VND_avgRPDs_test.txt"
-#define FILE_VND_AVG_CTS W "results\\VND_avgCTs_test.txt"
-
-// FOR UBUNTU
-#define UFILE_II_ALL_INST_WCT "results/II_WCT_results.csv"
-#define UFILE_II_ALL_INST_RPD "results/II_RPD_results.csv"
-#define UFILE_VND_ALL_INST_WCT "results/VND_WCT_results.csv"
-#define UFILE_VND_ALL_INST_RPD "results/VND_RPD_results.csv"
-
-#define UFILE_INSTANCES "instances/"
-#define UFILE_INST_SMALL "small/05_03_01";
-#define UFILE_BEST_KNOWN_SOLS "instances/bestSolutions.txt";
-#define UFILE_II_AVG_RPDS "results/II_avgRPDs_results.csv"
-#define UFILE_II_AVG_CTS "results/II_avgCTs_results.csv"
-#define UFILE_VND_AVG_RPDS "results/VND_avgRPDs_results.csv"
-#define UFILE_VND_AVG_CTS "results/VND_avgCTs_results.csv"
-#define UFILE_VND_PI "results/VND_PI_results.csv"
+#include "Utils.h"
 
 using namespace std;
 typedef vector<double> vdouble;
 typedef vector<vector<int>> vvint;
 typedef vector<vector<double>> vvdouble;
 
-template <typename T>
-std::ostream & operator << (std::ostream & os, const std::vector<T> & vec)
-{
-    for(auto elem : vec) {
-        os << elem << ", ";
-    }
-    return os;
-}
-
 /***************************************************************************/
 
-string getInstanceName(int i, int j) {
-    // i = represents instance with 50 or 100 jobs
-    // j = the instance number
-    string instance_name = "";
-    if (i == 0) {
-        instance_name += "50_20_";
-    } else {
-        instance_name += "100_20_";
-    }
-    string instance_nb = "";
-    if (j < 10) {
-        instance_nb = "0" + to_string(j);
-    } else {
-        instance_nb += to_string(j);
-    }
-    return instance_name + instance_nb;
-}
-
 void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header, vector<string> filenames) {
-    vector<vector<string>> modes = {vector<string>{"R", "SRZ"}, vector<string>{"FI", "BI"}, vector<string>{"T", "E", "I"}};
 
     int nb_algos = all_wcts[0].size();
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
         myfile.open(filenames[k]);
+        myfile << "sep=,";
         myfile << header;
 
         string line;
@@ -121,6 +65,7 @@ void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
     // stats = either average computation times, either average relative percentage deviations
     ofstream myfile;
     myfile.open(filename);
+    myfile << "sep=,";
     myfile << header;
     string line;
     for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
@@ -142,17 +87,6 @@ void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
 }
 
 /***************************************************************************/
-
-
-
-double relativePercentageDeviation(int wct, int best_known) {
-    /*
-    Computes the relative percentage deviation of the algorithm k on the instance i
-    algorithm k = a combination of different mode
-    for example : --random --firstImprovement --tranpose
-    */
-    return 100 * (((double) wct - (double) best_known) / (double) best_known);
-}
 
 void testAllAlgosII(PfspInstance instance, vdouble &computation_times, vdouble &RPD, int best_known, vvint &all_wcts, int inst_nb) {
     /*
@@ -396,7 +330,7 @@ void testInstanceVND(string instance_filename, string init_rule, vector<string> 
 
 }
 
-void runAllExperiments(vvint best_knowns) {
+void runAllExperimentsA1(vvint best_knowns) {
     // ======================================================
     // TEST ITERATIVE IMPROVEMENT ON ALL INSTANCES (50 + 100)
     // ======================================================
@@ -433,25 +367,6 @@ void runAllExperiments(vvint best_knowns) {
     writeAlgosStatsToFile(filenamesVND_stats[2], PI_VND, header_vnd);
 }
 
-void processArgv(int argc, char *argv[]) {
-    if (argc == 1) {
-        cout << "Usage: ./flowshopRUN <II> <init> (R, SRZ) <pivoting> (FI, BI) <neighbour> (T, E, I) <instance_file>" << endl;
-        cout << "Usage: ./flowshopRUN <VND> <init> (R, SRZ) <n1> <n2> <n3> (T E I or T I E) <instance_file>" << endl;
-        cout << "Usage: ./flowshopRUN <runAllExperiments>" << endl;
-    } else {
-        cout << argv[1] << endl;
-        if (string(argv[1]) == "II") {
-            cout << argv[5] << argv[2] << argv[3] << argv[4] << endl;
-            testInstanceII(string(argv[5]), string(argv[2]), string(argv[3]), string(argv[4]));
-        } else if (string(argv[1]) == "VND") {
-            vector<string> neighbour_rules = {string(argv[3]), string(argv[4]), string(argv[5])};
-            testInstanceVND(string(argv[6]), string(argv[2]), neighbour_rules);
-        } else {
-            string filenameBestSols = UFILE_BEST_KNOWN_SOLS;
-            vvint best_knowns =  readBestSolFromFile(filenameBestSols);
-            runAllExperiments(best_knowns);
-        }
-    }
-}
+
 
 #endif //VERSION_C___EXPERIMENTSASSIGNMENT1_H
