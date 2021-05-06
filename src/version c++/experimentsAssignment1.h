@@ -29,7 +29,7 @@ void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header
     for (int k = 0; k < 2; k++) {
         ofstream myfile;
         myfile.open(filenames[k]);
-        myfile << "sep=,";
+        myfile << "sep=,\n";
         myfile << header;
 
         string line;
@@ -65,7 +65,7 @@ void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
     // stats = either average computation times, either average relative percentage deviations
     ofstream myfile;
     myfile.open(filename);
-    myfile << "sep=,";
+    myfile << "sep=,\n";
     myfile << header;
     string line;
     for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
@@ -341,7 +341,8 @@ void runAllExperimentsA1(vvint best_knowns) {
     IItestAllInstances(all_wcts, all_rpds, avg_CTs, avg_RPDs, best_knowns);
     string header = "instance,RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI\n";
     vector<string> filenames = {UFILE_II_ALL_INST_WCT, UFILE_II_ALL_INST_RPD};
-    writeAllInstancesResToFile(all_wcts, all_rpds, header, filenames);
+    writeAllInstancesResToFile2(all_wcts, header, UFILE_II_ALL_INST_WCT);
+    writeAllInstancesResToFile2(all_rpds, header, UFILE_II_ALL_INST_RPD);
     vector<string> filenamesII_avg = {UFILE_II_AVG_RPDS, UFILE_II_AVG_CTS};
     writeAlgosStatsToFile(filenamesII_avg[0], avg_RPDs, header);
     writeAlgosStatsToFile(filenamesII_avg[1], avg_CTs, header);
@@ -356,7 +357,8 @@ void runAllExperimentsA1(vvint best_knowns) {
     VNDtestAllInstances(all_wcts_VND, all_rpds_VND, avg_CTs_VND, avg_RPDs_VND, best_knowns);
     string header_vnd = "instance,RTEI,RTIE,STEI,STIE\n";
     vector<string> filenamesVND = {UFILE_VND_ALL_INST_WCT, UFILE_VND_ALL_INST_RPD};
-    writeAllInstancesResToFile(all_wcts_VND, all_rpds_VND, header_vnd, filenamesVND);
+    writeAllInstancesResToFile2(all_wcts_VND, header_vnd, UFILE_VND_ALL_INST_WCT);
+    writeAllInstancesResToFile2(all_rpds_VND, header_vnd, UFILE_VND_ALL_INST_RPD);
     vector<string> filenamesVND_stats = {UFILE_VND_AVG_RPDS, UFILE_VND_AVG_CTS, UFILE_VND_PI};
     writeAlgosStatsToFile(filenamesVND_stats[0], avg_RPDs_VND, header_vnd);
     writeAlgosStatsToFile(filenamesVND_stats[1], avg_CTs_VND, header_vnd);

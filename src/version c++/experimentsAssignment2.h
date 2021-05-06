@@ -258,6 +258,7 @@ void testTabu() {
 // all experiments
 
 void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpds, vvint best_knowns, int run) {
+    srand ( time(NULL) ); // random seed per run, but same for both GA and TS
     string base_filename = UFILE_INSTANCES;
     int inst_nb = 0;
 
@@ -265,7 +266,7 @@ void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpd
         for (int j = 0; j < 30; j++) { // nb of instances per job nb
             string instance_name = getInstanceName(i, j + 1);
             string inst_filename = base_filename + instance_name;
-            cout << instance_name << endl;
+//            cout << instance_name << endl;
             PfspInstance instance;
             instance.readDataFromFile(inst_filename);
 
@@ -276,6 +277,20 @@ void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpd
             inst_nb++;
         }
     }
+}
+
+vvdouble getAvgRunsRpds(vvdouble avg_rpds) {
+    vvdouble avg_runs_rpds(avg_rpds.size());
+    for(int i = 0; i < avg_rpds.size(); i++) {
+        double avg_ga_rpd = 0;
+        double avg_ts_rpd = 0;
+        for (int j = 0; j < 5; j++) {
+            avg_ga_rpd += avg_rpds[i][j] / 5;
+            avg_ts_rpd += avg_rpds[i][j+5] / 5;
+        }
+        avg_runs_rpds[i] = {avg_ga_rpd, avg_ts_rpd};
+    }
+    return avg_runs_rpds;
 }
 
 void runAllExperimentsA2(vvint best_knowns) {
@@ -298,10 +313,14 @@ void runAllExperimentsA2(vvint best_knowns) {
     cout <<"5 runs done in " << chrono::duration <double> (chrono::steady_clock::now()-start_runs_time).count() << " sec." << endl;
 
     string header = "instance,GA1,GA2,GA3,GA4,GA5,TS1,TS2,TS3,TS4,TS5\n";
-    vector<string> filenames = {UFILE_SLS_ALL_INST_WCT, UFILE_SLS_ALL_INST_RPD};
 
-    writeAllInstancesResToFile(all_wcts, all_rpds, header, filenames);
+    writeAllInstancesResToFile2(all_wcts, header, UFILE_SLS_ALL_INST_WCT);
+    writeAllInstancesResToFile2(all_rpds, header, UFILE_SLS_ALL_INST_RPD);
+    vvdouble avg_runs_rpds = getAvgRunsRpds(all_rpds);
+    string header_avg = "instance,GA,TS\n";
+    writeAllInstancesResToFile2(avg_runs_rpds, header_avg, UFILE_SLS_ALL_INST_AVG_RPDS);
     writeAlgosStatsToFile(UFILE_SLS_AVG_RPDS, avg_rpds, header);
 }
 
 #endif //VERSION_C___EXPERIMENTSASSIGNMENT2_H
+

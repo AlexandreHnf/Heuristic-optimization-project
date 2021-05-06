@@ -45,7 +45,6 @@ void processArgv(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    srand ( time(NULL) );
 
     // =====================================================
     // ===================: ASSIGNMENT 1 :==================
