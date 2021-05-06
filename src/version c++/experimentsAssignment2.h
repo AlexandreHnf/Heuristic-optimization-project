@@ -10,6 +10,7 @@
 #include <ctime>
 #include <chrono>
 #include <fstream>
+#include <thread>         // std::thread
 #include "Utils.h"
 #include "pfspinstance.h"
 #include "flowshop.h"
@@ -285,10 +286,16 @@ void runAllExperimentsA2(vvint best_knowns) {
     vvdouble all_rpds(60, vdouble(10));
     vvdouble avg_rpds = {vdouble(10), vdouble(10)};
 
-    for(int run=0; run < 5; run++) {
-        cout << ">>>>>>>>>> Run " << run+1 << endl;
-        SLSalgosAllInstances(all_wcts, all_rpds, avg_rpds, best_knowns, run);
-    }
+    auto start_runs_time = chrono::steady_clock::now();
+
+    // start threads
+    vector<thread> runs(5);
+    for (int i = 0; i < 5; i++)
+        runs[i] = thread(SLSalgosAllInstances,ref(all_wcts), ref(all_rpds), ref(avg_rpds), best_knowns, i);
+    for (int i = 0; i < 5; i++)
+        runs[i].join(); // synchronize threads, pauses until all runs finish:
+
+    cout <<"5 runs done in " << chrono::duration <double> (chrono::steady_clock::now()-start_runs_time).count() << " sec." << endl;
 
     string header = "instance,GA1,GA2,GA3,GA4,GA5,TS1,TS2,TS3,TS4,TS5\n";
     vector<string> filenames = {UFILE_SLS_ALL_INST_WCT, UFILE_SLS_ALL_INST_RPD};
