@@ -24,11 +24,11 @@
 #define PM 0.5
 #define PC 1.0
 #define PE 0.4
-#define COUNT 10
+#define COUNT 1000
 #define POP_SIZE 50
 
-#define MAX_TIME_50 0.1 //500
-#define MAX_TIME_100 0.1 //350.0
+#define MAX_TIME_50 150.0  //0.1
+#define MAX_TIME_100 350.0 // 0.1
 
 /***************************************************************************/
 // Some Unit tests of MGA and Tabu
@@ -227,7 +227,6 @@ void testInstanceTabu(int tabu_tenure, float max_time, string instance_file) {
 }
 
 void testSLSOneInstance(PfspInstance instance, vvdouble &all_rpds, vvint &all_wcts, int best_known, int inst_nb, int run) {
-    srand ( time(NULL) ); // RANDOM SEED per instance
 
     double max_time = MAX_TIME_50;
     if (instance.getNbJob() == 100)
@@ -241,7 +240,7 @@ void testSLSOneInstance(PfspInstance instance, vvdouble &all_rpds, vvint &all_wc
 
     // run Tabu on one instance
     auto start_ts_time = chrono::steady_clock::now();
-    Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, MAX_TIME_50);
+    Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, max_time);
     all_wcts[inst_nb][run+5] = solutionTS.wct;
     all_rpds[inst_nb][run+5] = relativePercentageDeviation(solutionTS.wct, best_known);
 }
@@ -258,8 +257,7 @@ void testTabu() {
 // all experiments
 
 void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpds, vvint best_knowns, int run) {
-//    srand ( time(NULL) ); // random seed per run, but same for both GA and TS
-    srand ( run ); // random seed per run, but same for both GA and TS
+    srand ( time(NULL) ); // random seed per run, but same for both GA and TS
     string base_filename = UFILE_INSTANCES;
     int inst_nb = 0;
 
@@ -267,7 +265,7 @@ void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpd
         for (int j = 0; j < 30; j++) { // nb of instances per job nb
             string instance_name = getInstanceName(i, j + 1);
             string inst_filename = base_filename + instance_name;
-//            cout << instance_name << endl;
+            cout << run+1 << " : " << instance_name << endl;
             PfspInstance instance;
             instance.readDataFromFile(inst_filename);
 

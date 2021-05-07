@@ -334,8 +334,8 @@ void reproduction(PfspInstance instance, int N, float Pc, float Pm, Population p
 
         // local search to improve both son and daughter
         // Random - First improvement - Insert seems to be the best Iterative improvement algo
-//        son = iterativeImprovement("FI", "I", instance, son);
-//        daughter = iterativeImprovement("FI", "I", instance, daughter);
+        son = iterativeImprovement("FI", "I", instance, son);
+        daughter = iterativeImprovement("FI", "I", instance, daughter);
 
         offspring_pop.push_back(son);
         offspring_pop.push_back(daughter);
@@ -365,7 +365,7 @@ Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, fl
     Solution artificial_chromosome = WSMGS(instance, E);
 
     while (! terminationCriterion(start_time, max_time, count, COUNT)) {
-//        cout << "     Generation " << it << " : " << best_sol.wct << " " << endl;
+        cout << "     Generation " << it << " : " << best_sol.wct << " " << endl;
 
         Population offspring_pop;
         reproduction(instance, N, Pc, Pm, pop, offspring_pop, artificial_chromosome);
