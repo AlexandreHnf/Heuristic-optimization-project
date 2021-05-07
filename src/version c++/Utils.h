@@ -104,10 +104,9 @@ double relativePercentageDeviation(int wct, int best_known) {
 }
 
 template <typename T>
-void writeAllInstancesResToFile2(vector<vector<T>> all_res, string header, string filename) {
+void writeAllInstancesResToFile(vector<vector<T>> all_res, string header, string filename) {
 
     int nb_algos = all_res[0].size();
-    cout << nb_algos << endl;
     ofstream myfile;
     myfile.open(filename);
 //    myfile << "sep=,\n";
@@ -134,7 +133,7 @@ void writeAllInstancesResToFile2(vector<vector<T>> all_res, string header, strin
         }
     }
     myfile.close();
-    cout << "written to files : ok" << endl;
+    cout << "written to " << filename << ": ok" << endl;
 }
 
 #endif //VERSION_C___UTILS_H

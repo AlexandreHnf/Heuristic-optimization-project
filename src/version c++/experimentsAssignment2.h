@@ -258,7 +258,8 @@ void testTabu() {
 // all experiments
 
 void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpds, vvint best_knowns, int run) {
-    srand ( time(NULL) ); // random seed per run, but same for both GA and TS
+//    srand ( time(NULL) ); // random seed per run, but same for both GA and TS
+    srand ( run ); // random seed per run, but same for both GA and TS
     string base_filename = UFILE_INSTANCES;
     int inst_nb = 0;
 
@@ -314,11 +315,11 @@ void runAllExperimentsA2(vvint best_knowns) {
 
     string header = "instance,GA1,GA2,GA3,GA4,GA5,TS1,TS2,TS3,TS4,TS5\n";
 
-    writeAllInstancesResToFile2(all_wcts, header, UFILE_SLS_ALL_INST_WCT);
-    writeAllInstancesResToFile2(all_rpds, header, UFILE_SLS_ALL_INST_RPD);
+    writeAllInstancesResToFile(all_wcts, header, UFILE_SLS_ALL_INST_WCT);
+    writeAllInstancesResToFile(all_rpds, header, UFILE_SLS_ALL_INST_RPD);
     vvdouble avg_runs_rpds = getAvgRunsRpds(all_rpds);
     string header_avg = "instance,GA,TS\n";
-    writeAllInstancesResToFile2(avg_runs_rpds, header_avg, UFILE_SLS_ALL_INST_AVG_RPDS);
+    writeAllInstancesResToFile(avg_runs_rpds, header_avg, UFILE_SLS_ALL_INST_AVG_RPDS);
     writeAlgosStatsToFile(UFILE_SLS_AVG_RPDS, avg_rpds, header);
 }
 

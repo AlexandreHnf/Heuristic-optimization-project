@@ -302,7 +302,6 @@ vector<vInt> readBestSolFromFile(basic_string<char> filename) {
             }
         }
 
-        cout << "All is read from file." << std::endl;
         fileIn.close();
     }
     else {

@@ -23,44 +23,6 @@ typedef vector<vector<double>> vvdouble;
 
 /***************************************************************************/
 
-void writeAllInstancesResToFile(vvint all_wcts, vvdouble all_rpds, string header, vector<string> filenames) {
-
-    int nb_algos = all_wcts[0].size();
-    for (int k = 0; k < 2; k++) {
-        ofstream myfile;
-        myfile.open(filenames[k]);
-        myfile << "sep=,\n";
-        myfile << header;
-
-        string line;
-        int global_index = 0;
-//		for (int inst_nb_index = 0; inst_nb_index < 2; inst_nb_index++) { // 0 = instances 50, 1 = instances 100
-        for (int inst_nb_index = 1; inst_nb_index >= 0; inst_nb_index--) { // 0 = instances 50, 1 = instances 100
-            for (int i = 0; i < 30; i++) {
-
-                line = getInstanceName(inst_nb_index, i + 1) + ","; // +1 bc it starts at 01
-                for (int a = 0; a < nb_algos; a++) {
-                    if (k == 0) { // if first file : WCTs
-                        line += to_string(all_wcts[global_index][a]);
-                    } else { // if second file : RPDs
-                        line += to_string(all_rpds[global_index][a]);
-                    }
-
-                    if (a < nb_algos - 1) {
-                        line += ",";
-                    } else {
-                        line += "\n";
-                    }
-                }
-                myfile << line;
-                global_index++;
-            }
-        }
-        myfile.close();
-    }
-    cout << "written to files : ok" << endl;
-}
-
 void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
     // stats = either average computation times, either average relative percentage deviations
     ofstream myfile;
@@ -83,7 +45,7 @@ void writeAlgosStatsToFile(string filename, vvdouble stats, string header) {
         myfile << line;
     }
     myfile.close();
-    cout << "written to files : ok" << endl;
+    cout << "written to " << filename << ": ok" << endl;
 }
 
 /***************************************************************************/
@@ -341,8 +303,8 @@ void runAllExperimentsA1(vvint best_knowns) {
     IItestAllInstances(all_wcts, all_rpds, avg_CTs, avg_RPDs, best_knowns);
     string header = "instance,RFT,RFE,RFI,RBT,RBE,RBI,SFT,SFE,SFI,SBT,SBE,SBI\n";
     vector<string> filenames = {UFILE_II_ALL_INST_WCT, UFILE_II_ALL_INST_RPD};
-    writeAllInstancesResToFile2(all_wcts, header, UFILE_II_ALL_INST_WCT);
-    writeAllInstancesResToFile2(all_rpds, header, UFILE_II_ALL_INST_RPD);
+    writeAllInstancesResToFile(all_wcts, header, UFILE_II_ALL_INST_WCT);
+    writeAllInstancesResToFile(all_rpds, header, UFILE_II_ALL_INST_RPD);
     vector<string> filenamesII_avg = {UFILE_II_AVG_RPDS, UFILE_II_AVG_CTS};
     writeAlgosStatsToFile(filenamesII_avg[0], avg_RPDs, header);
     writeAlgosStatsToFile(filenamesII_avg[1], avg_CTs, header);
@@ -357,8 +319,8 @@ void runAllExperimentsA1(vvint best_knowns) {
     VNDtestAllInstances(all_wcts_VND, all_rpds_VND, avg_CTs_VND, avg_RPDs_VND, best_knowns);
     string header_vnd = "instance,RTEI,RTIE,STEI,STIE\n";
     vector<string> filenamesVND = {UFILE_VND_ALL_INST_WCT, UFILE_VND_ALL_INST_RPD};
-    writeAllInstancesResToFile2(all_wcts_VND, header_vnd, UFILE_VND_ALL_INST_WCT);
-    writeAllInstancesResToFile2(all_rpds_VND, header_vnd, UFILE_VND_ALL_INST_RPD);
+    writeAllInstancesResToFile(all_wcts_VND, header_vnd, UFILE_VND_ALL_INST_WCT);
+    writeAllInstancesResToFile(all_rpds_VND, header_vnd, UFILE_VND_ALL_INST_RPD);
     vector<string> filenamesVND_stats = {UFILE_VND_AVG_RPDS, UFILE_VND_AVG_CTS, UFILE_VND_PI};
     writeAlgosStatsToFile(filenamesVND_stats[0], avg_RPDs_VND, header_vnd);
     writeAlgosStatsToFile(filenamesVND_stats[1], avg_CTs_VND, header_vnd);
