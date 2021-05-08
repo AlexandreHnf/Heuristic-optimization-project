@@ -25,7 +25,7 @@
 #define PC 1.0
 #define PE 0.4
 #define COUNT 1000
-#define POP_SIZE 50
+#define POP_SIZE 10
 
 #define MAX_TIME_50 150.0  //0.1
 #define MAX_TIME_100 350.0 // 0.1
