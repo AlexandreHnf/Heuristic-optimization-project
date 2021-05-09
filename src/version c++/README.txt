@@ -4,6 +4,7 @@
 ./flowshopRUN <TS> <tenure> <max_time> <instance_file>
 ./flowshopRUN <GA> <Pm> <Pc> <Pe> <COUNT> <pop size> <max_time> <instance_file>
 ./flowshopRUN <runAllExperimentsA2>
+./flowshopRUN <runRTDexperiments>
 
 e.g. ./flowshopRUN II R FI T instances/50_20_01
 e.g. ./flowshopRUN VND SRZ T E I instances/100_20_01

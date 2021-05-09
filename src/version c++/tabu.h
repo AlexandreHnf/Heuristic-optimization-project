@@ -14,6 +14,7 @@
 #include <bits/stdc++.h>
 #include "pfspinstance.h"
 #include "flowshop.h"
+#include "Utils.h"
 
 using namespace std;
 typedef vector<int> vInt;
@@ -153,13 +154,13 @@ Solution getBestNeighbour(PfspInstance instance, Solution candidate, vvInt &tabu
     return best_neighs[chosen_neigh];
 }
 
+
 bool terminationCriterion(int it, chrono::steady_clock::time_point start_time, double max_time) {
     auto now = chrono::steady_clock::now();
     double timing = chrono::duration <double> (now-start_time).count();
     if (timing >= max_time)
         return true;
 
-//    return it >= 1000;
     return false;
 }
 
@@ -172,26 +173,26 @@ vvInt initTabuMatrix(PfspInstance instance) {
     return tabu_matrix;
 }
 
-Solution tabuSearch(PfspInstance instance, int max_tabu_size, chrono::steady_clock::time_point start_time, double max_time) {
+Solution tabuSearch(PfspInstance instance, int max_tabu_size, timing start_time, double max_time, vdouble &best_runtimes) {
     Solution init_sol = generateRndSol(instance);
     Solution best_sol = init_sol;
     vvInt tabu_mat = initTabuMatrix(instance);
     Solution best_candidate = init_sol;
     int it = 0;
     while (! terminationCriterion(it, start_time, max_time)) {
-//        cout << "it " << it << ", B : " << best_sol.wct;
         it++;
         best_candidate = getBestNeighbour(instance, best_candidate, tabu_mat, best_sol.wct, max_tabu_size);
-        if (best_candidate.sol.size() == 0) // if no improving neighbour
+        if (best_candidate.sol.empty()) // if no improving neighbour
             best_candidate = best_sol;
-//        cout << " C : " << best_candidate.wct << endl;
+//        cout << "it " << it << ", B : " << best_sol.wct << " C : " << best_candidate.wct << endl;
 
         if (best_candidate.wct < best_sol.wct) {
             best_sol = best_candidate;
         }
+        if (!best_runtimes.empty())
+            updateBestRuntimes(instance, best_runtimes, best_sol, start_time);
     }
     return best_sol;
-
 }
 
 #endif //VERSION_C___TABU_H

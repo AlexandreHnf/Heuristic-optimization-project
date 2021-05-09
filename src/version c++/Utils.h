@@ -14,6 +14,8 @@
 #include <vector>
 using namespace std;
 
+typedef chrono::steady_clock::time_point timing;
+
 // ========== FOR WINDOWS
 #define W "D:\\Users\\Alexandre\\Desktop\\ULB\\MA2\\Heuristic optimization\\Projet\\repository\\Heuristic-optimization-project\\src\\version c++\\"
 
@@ -63,7 +65,9 @@ using namespace std;
 #define UFILE_SLS_ALL_INST_AVG_RPDS "results/SLS_avgrunsRPDs_results.csv"
 #define UFILE_SLS_AVG_RPDS "results/SLS_avgRPDs_results.csv"
 
-// Results Tabu
+// Results RTDs
+#define UFILE_SLS_RTD_1 "results/SLS_RTD_1.csv"
+#define UFILE_SLS_RTD_2 "results/SLS_RTD_2.csv"
 
 // ==========================================================================
 
@@ -135,5 +139,41 @@ void writeAllInstancesResToFile(vector<vector<T>> all_res, string header, string
     myfile.close();
     cout << "written to " << filename << ": ok" << endl;
 }
+
+void writeRTDToFile(vector<vector<double>> all_timings, string header, string filename) {
+    int nb_rows = all_timings.size();
+    int nb_percentages = 10; // nb of percentages (0.1,0.5... ga + ts = 10)
+    ofstream myfile;
+    myfile.open(filename);
+    myfile << header;
+    string line;
+    for (int i = 0; i < nb_rows; i++) {
+        for (int p = 0; p < nb_percentages; p++) {
+            line += to_string(all_timings[i][p]);
+            if (p < nb_percentages-1) {
+                line += ",";
+            } else {
+                line += "\n";
+            }
+        }
+        myfile << line;
+    }
+    myfile.close();
+    cout << "written to " << filename << ": ok" << endl;
+}
+
+void updateBestRuntimes(PfspInstance instance, vector<double> &best_runtimes, Solution best_sol, timing start_time) {
+    for (int i = 0; i < instance.getNbBestSols(); i++) {
+        if (best_runtimes[i] == -1.0) {
+            int close_sol = instance.getClosestSolution(i);
+            int diff = best_sol.wct - close_sol;
+            if (close_sol >= best_sol.wct or (diff > 0 and diff < 0.03*close_sol/100)) {
+                best_runtimes[i] = chrono::duration <double> (chrono::steady_clock::now()-start_time).count();
+                cout << "close sol " << i << " found in : " << best_runtimes[i] << " sec." << endl;
+            }
+        }
+    }
+}
+
 
 #endif //VERSION_C___UTILS_H

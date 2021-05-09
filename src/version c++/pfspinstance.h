@@ -17,6 +17,7 @@ class PfspInstance{
         std::vector< long int > weights;
 
         std::vector< std::vector <long int> > processing_times;
+        std::vector < int > best_closest_solutions;
 
     public:
         PfspInstance();
@@ -40,6 +41,10 @@ class PfspInstance{
 
         long int getPriority(int job);
         void setPriority(int job, int value);
+
+        void setBestSolutions(int best_known);
+        int getNbBestSols();
+        int getClosestSolution(int i);
 
         /* Read Data from a file : */
         bool readDataFromFile(std::basic_string<char> fileName);
