@@ -30,6 +30,11 @@
 #define MAX_TIME_50 150.0  //0.1
 #define MAX_TIME_100 350.0 // 0.1
 
+// ======== RTD PARAMETERS
+#define NB_ITERATIONS 2
+#define NB_INSTANCES 2
+#define MAX_TIMING 500.0
+
 /***************************************************************************/
 // Some Unit tests of MGA and Tabu
 
@@ -133,7 +138,8 @@ void testMGASmallInstance(float Pe, float Pc, float Pm, int max_COUNT, int pop_s
         return;
     cout << "ok parse" << endl;
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = memeticGeneticAlgo(instance_small, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, max_time);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = memeticGeneticAlgo(instance_small, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, max_time, best_runtimes);
     cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
@@ -147,19 +153,22 @@ void testMGAmediumInstance(float Pe, float Pc, float Pm, int max_COUNT, int pop_
         return;
     cout << "ok parse" << endl;
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = memeticGeneticAlgo(instance_medium, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, max_time);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = memeticGeneticAlgo(instance_medium, pop_size, Pe, Pc, Pm, COUNT, start_alg_time, max_time, best_runtimes);
     cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
 
 void testInstanceMGA(float Pm, float Pc, float Pe, int max_count, int pop_size, float max_time, string instance_file) {
     PfspInstance instance;
+    instance.setBestSolutions(595260);
     if (! instance.readDataFromFile(instance_file) )
         return;
     srand ( time(NULL) );
 
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = memeticGeneticAlgo(instance, pop_size, Pe, Pc, Pm, max_count, start_alg_time, max_time);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = memeticGeneticAlgo(instance, pop_size, Pe, Pc, Pm, max_count, start_alg_time, max_time, best_runtimes);
     cout << instance_file << " done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
@@ -192,7 +201,8 @@ void testTabuSmall(int tabu_tenure) {
         return;
     cout << "ok parse" << endl;
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = tabuSearch(instance_small, tabu_tenure, start_alg_time, 50);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = tabuSearch(instance_small, tabu_tenure, start_alg_time, 50, best_runtimes);
     cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
@@ -206,13 +216,15 @@ void testTabuMedium(int tabu_tenure) {
         return;
     cout << "ok parse" << endl;
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = tabuSearch(instance_medium, tabu_tenure, start_alg_time, 50);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = tabuSearch(instance_medium, tabu_tenure, start_alg_time, 50, best_runtimes);
     cout << "Done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
 
 void testInstanceTabu(int tabu_tenure, float max_time, string instance_file) {
     PfspInstance instance;
+    instance.setBestSolutions(595260);
     if (! instance.readDataFromFile(instance_file) )
         return;
     srand ( time(NULL) );
@@ -221,7 +233,8 @@ void testInstanceTabu(int tabu_tenure, float max_time, string instance_file) {
         return;
 
     auto start_alg_time = chrono::steady_clock::now();
-    Solution bs = tabuSearch(instance, tabu_tenure, start_alg_time, max_time);
+    vdouble best_runtimes(5, -1.0);
+    Solution bs = tabuSearch(instance, tabu_tenure, start_alg_time, max_time, best_runtimes);
     cout << instance_file << " done in " << chrono::duration <double> (chrono::steady_clock::now()-start_alg_time).count() << " sec." << endl;
     printSol(bs);
 }
@@ -234,13 +247,15 @@ void testSLSOneInstance(PfspInstance instance, vvdouble &all_rpds, vvint &all_wc
 
     // run MGA on one instance
     auto start_ga_time = chrono::steady_clock::now();
-    Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, COUNT, start_ga_time, max_time);
+    vdouble best_runtimes(5, -1.0);
+    Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, COUNT, start_ga_time, max_time, best_runtimes);
     all_wcts[inst_nb][run] = solutionGA.wct;
     all_rpds[inst_nb][run] = relativePercentageDeviation(solutionGA.wct, best_known);
     cout << run+1 << " GA done " << chrono::duration <double> (chrono::steady_clock::now()-start_ga_time).count() << " sec." << endl;
     // run Tabu on one instance
     auto start_ts_time = chrono::steady_clock::now();
-    Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, max_time);
+    vdouble best_runtimes2(5, -1.0);
+    Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, max_time, best_runtimes2);
     all_wcts[inst_nb][run+5] = solutionTS.wct;
     all_rpds[inst_nb][run+5] = relativePercentageDeviation(solutionTS.wct, best_known);
     cout << run+1 << " TS done " << chrono::duration <double> (chrono::steady_clock::now()-start_ts_time).count() << " sec." << endl;
@@ -254,8 +269,9 @@ void testTabu() {
     testTabuMedium(7);
 }
 
-// ==================
-// all experiments
+// ==================================================
+// ============== ALL EXPERIMENTS  ==================
+// ==================================================
 
 void SLSalgosAllInstances(vvint &all_wcts, vvdouble &all_rpds, vvdouble &avg_rpds, vvint best_knowns, int run) {
     srand ( time(NULL) ); // random seed per run, but same for both GA and TS
@@ -320,6 +336,49 @@ void runAllExperimentsA2(vvint best_knowns) {
     string header_avg = "instance,GA,TS\n";
     writeAllInstancesResToFile(avg_runs_rpds, header_avg, UFILE_SLS_ALL_INST_AVG_RPDS);
     writeAlgosStatsToFile(UFILE_SLS_AVG_RPDS, avg_rpds, header);
+}
+
+// ==================================================
+// ============ RUN-TIME DISTRIBUTIONS ==============
+// ==================================================
+
+void RTDoneInstance(PfspInstance instance, vvdouble &all_timings, double max_time, int run) {
+    auto start_ga_time = chrono::steady_clock::now();
+    vdouble best_runtimes1(5, -1.0);
+    Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, COUNT, start_ga_time, max_time, best_runtimes1);
+
+    // run Tabu on one instance
+    auto start_ts_time = chrono::steady_clock::now();
+    vdouble best_runtimes2(5, -1.0);
+    Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, max_time, best_runtimes2);
+
+    best_runtimes1.insert( best_runtimes1.end(), best_runtimes2.begin(), best_runtimes2.end() );
+    all_timings[run] = best_runtimes1;
+}
+
+void runAllRTDexperiments(vvint best_knowns) {
+    vector<string> filenames = {UFILE_SLS_RTD_1, UFILE_SLS_RTD_2};
+
+    string header = "run,best,GA0.1,GA0.5,GA1,GA2,TS0.1,TS0.5,TS1,TS2\n";
+    for (int inst = 0; inst < NB_INSTANCES; inst++) {
+        PfspInstance instance;
+        instance.readDataFromFile("instances/" + getInstanceName(0, inst+1));
+        instance.setBestSolutions(best_knowns[0][inst]);
+        vvdouble all_timings(NB_ITERATIONS, vdouble(10, -1)); // 25 repetitions
+
+        // start threads
+        vector<thread> runs(NB_ITERATIONS);
+        for (int i = 0; i < NB_ITERATIONS; i++)
+            runs[i] = thread(RTDoneInstance, instance, ref(all_timings), MAX_TIMING, i);
+        for (int i = 0; i < NB_ITERATIONS; i++)
+            runs[i].join(); // synchronize threads, pauses until all runs finish:
+        cout << "best,0.1,0.5,1,2" << endl;
+        for (double t : all_timings[inst]) {
+            cout << t << " ";
+        }
+        cout << endl;
+        writeRTDToFile(all_timings, header, filenames[inst]);
+    }
 }
 
 #endif //VERSION_C___EXPERIMENTSASSIGNMENT2_H

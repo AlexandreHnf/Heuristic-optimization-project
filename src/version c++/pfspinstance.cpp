@@ -55,6 +55,25 @@ long int PfspInstance::getTime(int job, int machine)
     return processing_times[job][machine];
 }
 
+void PfspInstance::setBestSolutions(int best_known) {
+    /* set the list of best solutions close to the overall best solution
+     * percentages above the best known : {0.1,0.5,1,2}%
+     * */
+    best_closest_solutions.push_back(best_known);
+    best_closest_solutions.push_back(best_known + (0.1*best_known) / 100);
+    best_closest_solutions.push_back(best_known + (0.5*best_known) / 100);
+    best_closest_solutions.push_back(best_known + (1*best_known) / 100);
+    best_closest_solutions.push_back(best_known + (2*best_known) / 100);
+}
+
+int PfspInstance::getNbBestSols() {
+    return best_closest_solutions.size();
+}
+
+int PfspInstance::getClosestSolution(int i) {
+    return best_closest_solutions[i];
+}
+
 
 /* Read the instance from file : */
 bool PfspInstance::readDataFromFile(basic_string<char> fileName) {

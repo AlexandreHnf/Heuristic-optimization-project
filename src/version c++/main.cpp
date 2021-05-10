@@ -19,6 +19,7 @@ void processArgv(int argc, char *argv[]) {
         cout << "Usage: ./flowshopRUN <TS> <tenure> <max_time> <instance_file>" << endl;
         cout << "Usage: ./flowshopRUN <GA> <Pm> <Pc> <Pe> <COUNT> <pop size> <max_time> <instance_file>" << endl;
         cout << "Usage: ./flowshopRUN <runAllExperimentsA2>" << endl;
+        cout << "Usage: ./flowshopRUN <runRTDexperiments>" << endl;
     } else {
         cout << argv[1] << endl;
         if (string(argv[1]) == "II") {
@@ -40,6 +41,10 @@ void processArgv(int argc, char *argv[]) {
             string filenameBestSols = UFILE_BEST_KNOWN_SOLS;
             vvint best_knowns =  readBestSolFromFile(filenameBestSols);
             runAllExperimentsA2(best_knowns);
+        } else if (string(argv[1]) == "runRTDexperiments") {
+            string filenameBestSols = UFILE_BEST_KNOWN_SOLS;
+            vvint best_knowns =  readBestSolFromFile(filenameBestSols);
+            runAllRTDexperiments(best_knowns);
         }
     }
 }

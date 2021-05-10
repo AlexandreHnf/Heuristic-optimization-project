@@ -15,11 +15,13 @@
 #include <bits/stdc++.h>
 #include "pfspinstance.h"
 #include "flowshop.h"
+#include "Utils.h"
 
 using namespace std;
 typedef vector<int> vInt;
 typedef vector<vector<int>> vvInt;
 typedef vector<Solution> Population;
+
 
 int getRandomIndex(int start, int end, int to_avoid) {
     /* generate secret number between 0 and n different from to_avoid */
@@ -342,7 +344,7 @@ void reproduction(PfspInstance instance, int N, float Pc, float Pm, Population p
     }
 }
 
-bool terminationCriterion(chrono::steady_clock::time_point start_time, double max_time, int count, int COUNT) {
+bool terminationCriterion(timing start_time, double max_time, int count, int COUNT) {
     auto now = chrono::steady_clock::now();
     double timing = chrono::duration <double> (now-start_time).count();
     if (timing >= max_time or count > COUNT)
@@ -350,7 +352,7 @@ bool terminationCriterion(chrono::steady_clock::time_point start_time, double ma
     return false;
 }
 
-Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, float Pm, int COUNT, chrono::steady_clock::time_point start_time, double max_time) {
+Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, float Pm, int COUNT, timing start_time, double max_time, vdouble &best_runtimes) {
     /*
      * Memetic genetic algorithm to find the best solution for the flow shop problem
      *
@@ -363,6 +365,7 @@ Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, fl
     Solution best_sol = getBestChromosome(pop);
     Population E = eliteSelection(Pe, pop);  // elitist portion of the population
     Solution artificial_chromosome = WSMGS(instance, E);
+    timing init_time = start_time;
 
     while (! terminationCriterion(start_time, max_time, count, COUNT)) {
 //        cout << "     Generation " << it << " : " << best_sol.wct << " " << endl;
@@ -381,8 +384,11 @@ Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, fl
         } else {
             count++;
         }
-        if (it == 0)
-            start_time = chrono::steady_clock::now();
+//        if (it == 0) {
+//            start_time = chrono::steady_clock::now();
+//        }
+        if (!best_runtimes.empty())
+            updateBestRuntimes(instance, best_runtimes, best_sol, init_time);
         it++;
 
     }
