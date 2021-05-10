@@ -190,7 +190,7 @@ Solution tabuSearch(PfspInstance instance, int max_tabu_size, timing start_time,
             best_sol = best_candidate;
         }
         if (!best_runtimes.empty())
-            updateBestRuntimes(instance, best_runtimes, best_sol, start_time);
+            updateBestRuntimes(instance, best_runtimes, best_sol, start_time, max_time);
     }
     return best_sol;
 }

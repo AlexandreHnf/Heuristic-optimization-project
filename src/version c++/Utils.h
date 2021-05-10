@@ -142,12 +142,14 @@ void writeAllInstancesResToFile(vector<vector<T>> all_res, string header, string
 
 void writeRTDToFile(vector<vector<double>> all_timings, string header, string filename) {
     int nb_rows = all_timings.size();
+    cout << "nb rows to write : " << nb_rows << endl;
     int nb_percentages = 10; // nb of percentages (0.1,0.5... ga + ts = 10)
     ofstream myfile;
     myfile.open(filename);
     myfile << header;
     string line;
     for (int i = 0; i < nb_rows; i++) {
+        line = "";
         for (int p = 0; p < nb_percentages; p++) {
             line += to_string(all_timings[i][p]);
             if (p < nb_percentages-1) {
@@ -162,15 +164,19 @@ void writeRTDToFile(vector<vector<double>> all_timings, string header, string fi
     cout << "written to " << filename << ": ok" << endl;
 }
 
-void updateBestRuntimes(PfspInstance instance, vector<double> &best_runtimes, Solution best_sol, timing start_time) {
+void updateBestRuntimes(PfspInstance instance, vector<double> &best_runtimes, Solution best_sol, timing start_time, double max_time) {
     for (int i = 0; i < instance.getNbBestSols(); i++) {
         if (best_runtimes[i] == -1.0) {
             int close_sol = instance.getClosestSolution(i);
             int diff = best_sol.wct - close_sol;
+            // if close enough to the target solution
             if (close_sol >= best_sol.wct or (diff > 0 and diff < 0.03*close_sol/100)) {
                 best_runtimes[i] = chrono::duration <double> (chrono::steady_clock::now()-start_time).count();
                 cout << "close sol " << i << " found in : " << best_runtimes[i] << " sec." << endl;
             }
+            // if max time reached without finding sufficiently high sol
+            if (chrono::duration <double> (chrono::steady_clock::now()-start_time).count() >= max_time)
+                best_runtimes[i] = max_time;
         }
     }
 }

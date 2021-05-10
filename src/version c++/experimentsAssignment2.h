@@ -33,7 +33,7 @@
 // ======== RTD PARAMETERS
 #define NB_ITERATIONS 5
 #define NB_INSTANCES 2
-#define MAX_TIMING 10.0
+#define MAX_TIMING 200.0
 
 /***************************************************************************/
 // Some Unit tests of MGA and Tabu
@@ -344,7 +344,7 @@ void runAllExperimentsA2(vvint best_knowns) {
 void RTDoneInstance(PfspInstance instance, vvdouble &all_timings, double max_time, int run) {
     auto start_ga_time = chrono::steady_clock::now();
     vdouble best_runtimes1(5, -1.0);
-    Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, COUNT, start_ga_time, max_time, best_runtimes1);
+    Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, INT_MAX, start_ga_time, max_time, best_runtimes1);
 
     // run Tabu on one instance
     auto start_ts_time = chrono::steady_clock::now();
@@ -373,6 +373,7 @@ void runAllRTDexperiments(vvint best_knowns) {
             runs[i] = thread(RTDoneInstance, instance, ref(all_timings), MAX_TIMING, i);
         for (int i = 0; i < NB_ITERATIONS; i++)
             runs[i].join(); // synchronize threads, pauses until all runs finish:
+
         cout <<"Instance " << inst+1 << " done in " << chrono::duration <double> (chrono::steady_clock::now()-start_run_time).count() << " sec." << endl;
         writeRTDToFile(all_timings, header, filenames[inst]);
     }

@@ -355,11 +355,9 @@ bool terminationCriterion(timing start_time, double max_time, int count, int COU
 Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, float Pm, int COUNT, timing start_time, double max_time, vdouble &best_runtimes) {
     /*
      * Memetic genetic algorithm to find the best solution for the flow shop problem
-     *
      */
     int count = 1;  // record the nb of non improving consecutive generations
     int it = 0;
-//    vector<Solution> pop = generateInitPopulation(instance, N);
     vector<Solution> pop = generateFullRNDpop(instance, N);
 
     Solution best_sol = getBestChromosome(pop);
@@ -384,14 +382,11 @@ Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, fl
         } else {
             count++;
         }
-//        if (it == 0) {
-//            start_time = chrono::steady_clock::now();
-//        }
         if (!best_runtimes.empty())
-            updateBestRuntimes(instance, best_runtimes, best_sol, init_time);
+            updateBestRuntimes(instance, best_runtimes, best_sol, init_time, max_time);
         it++;
-
     }
+
 
     return best_sol;
 
