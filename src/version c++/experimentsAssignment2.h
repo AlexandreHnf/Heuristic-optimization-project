@@ -30,6 +30,11 @@
 #define MAX_TIME_50 150.0  //0.1
 #define MAX_TIME_100 350.0 // 0.1
 
+// ======== RTD PARAMETERS
+#define NB_ITERATIONS 2
+#define NB_INSTANCES 2
+#define MAX_TIMING 500.0
+
 /***************************************************************************/
 // Some Unit tests of MGA and Tabu
 
@@ -351,21 +356,20 @@ void RTDoneInstance(PfspInstance instance, vvdouble &all_timings, double max_tim
 }
 
 void runAllRTDexperiments(vvint best_knowns) {
-    int nb_runs = 2;
     vector<string> filenames = {UFILE_SLS_RTD_1, UFILE_SLS_RTD_2};
 
     string header = "run,best,GA0.1,GA0.5,GA1,GA2,TS0.1,TS0.5,TS1,TS2\n";
-    for (int inst = 0; inst < 2; inst++) {
+    for (int inst = 0; inst < NB_INSTANCES; inst++) {
         PfspInstance instance;
         instance.readDataFromFile("instances/" + getInstanceName(0, inst+1));
         instance.setBestSolutions(best_knowns[0][inst]);
-        vvdouble all_timings(nb_runs, vdouble(10, -1)); // 25 repetitions
+        vvdouble all_timings(NB_ITERATIONS, vdouble(10, -1)); // 25 repetitions
 
         // start threads
-        vector<thread> runs(nb_runs);
-        for (int i = 0; i < nb_runs; i++)
-            runs[i] = thread(RTDoneInstance, instance, ref(all_timings), 200.0, i);
-        for (int i = 0; i < nb_runs; i++)
+        vector<thread> runs(NB_ITERATIONS);
+        for (int i = 0; i < NB_ITERATIONS; i++)
+            runs[i] = thread(RTDoneInstance, instance, ref(all_timings), MAX_TIMING, i);
+        for (int i = 0; i < NB_ITERATIONS; i++)
             runs[i].join(); // synchronize threads, pauses until all runs finish:
         cout << "best,0.1,0.5,1,2" << endl;
         for (double t : all_timings[inst]) {
