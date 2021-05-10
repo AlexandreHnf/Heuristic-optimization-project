@@ -251,13 +251,14 @@ void testSLSOneInstance(PfspInstance instance, vvdouble &all_rpds, vvint &all_wc
     Solution solutionGA = memeticGeneticAlgo(instance, POP_SIZE, PE, PC, PM, COUNT, start_ga_time, max_time, best_runtimes);
     all_wcts[inst_nb][run] = solutionGA.wct;
     all_rpds[inst_nb][run] = relativePercentageDeviation(solutionGA.wct, best_known);
-
+    cout << run+1 << " GA done " << chrono::duration <double> (chrono::steady_clock::now()-start_ga_time).count() << " sec." << endl;
     // run Tabu on one instance
     auto start_ts_time = chrono::steady_clock::now();
     vdouble best_runtimes2(5, -1.0);
     Solution solutionTS = tabuSearch(instance, TENURE, start_ts_time, max_time, best_runtimes2);
     all_wcts[inst_nb][run+5] = solutionTS.wct;
     all_rpds[inst_nb][run+5] = relativePercentageDeviation(solutionTS.wct, best_known);
+    cout << run+1 << " TS done " << chrono::duration <double> (chrono::steady_clock::now()-start_ts_time).count() << " sec." << endl;
 }
 
 

@@ -1,3 +1,5 @@
+make
+
 ./flowshopRUN II <init> (R, SRZ) <pivoting> (FI, BI) <neighbour> (T, E, I) <instance_file>
 ./flowshopRUN VND <init> (R, SRZ) <n1> <n2> <n3> (T E I or T I E) <instance_file>"
 ./flowshopRUN <runAllExperimentsA1>
