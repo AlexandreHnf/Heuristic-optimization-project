@@ -381,6 +381,8 @@ Solution memeticGeneticAlgo(PfspInstance instance, int N, float Pe, float Pc, fl
         } else {
             count++;
         }
+        if (it == 0)
+            start_time = chrono::steady_clock::now();
         it++;
 
     }
