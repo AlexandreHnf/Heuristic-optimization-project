@@ -31,7 +31,7 @@
 #define MAX_TIME_100 350.0 // 0.1
 
 // ======== RTD PARAMETERS
-#define NB_ITERATIONS 5
+#define NB_ITERATIONS 25
 #define NB_INSTANCES 2
 #define MAX_TIMING 200.0
 
