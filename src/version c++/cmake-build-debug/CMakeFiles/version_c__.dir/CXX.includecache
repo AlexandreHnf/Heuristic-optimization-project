@@ -1,0 +1,160 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/MemeticGA.h
+string
+-
+vector
+-
+algorithm
+-
+random
+-
+iostream
+-
+cstdlib
+-
+bits/stdc++.h
+-
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+flowshop.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+Utils.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/Utils.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/Utils.h
+iostream
+-
+cstdlib
+-
+ctime
+-
+chrono
+-
+fstream
+-
+string
+-
+vector
+-
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/experimentsAssignment1.h
+iostream
+-
+cstdlib
+-
+ctime
+-
+chrono
+-
+fstream
+-
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+flowshop.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+Utils.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/Utils.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/experimentsAssignment2.h
+iostream
+-
+cstdlib
+-
+ctime
+-
+chrono
+-
+fstream
+-
+thread
+-
+Utils.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/Utils.h
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+flowshop.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+MemeticGA.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/MemeticGA.h
+tabu.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/tabu.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.cpp
+iostream
+-
+cstdlib
+-
+cstdio
+-
+cstdlib
+-
+ctime
+-
+algorithm
+-
+bits/stdc++.h
+-
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+flowshop.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+string
+-
+vector
+-
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/main.cpp
+experimentsAssignment1.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/experimentsAssignment1.h
+experimentsAssignment2.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/experimentsAssignment2.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.cpp
+iostream
+-
+fstream
+-
+cmath
+-
+cstring
+-
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+string
+-
+vector
+-
+
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/tabu.h
+string
+-
+vector
+-
+algorithm
+-
+random
+-
+iostream
+-
+cstdlib
+-
+bits/stdc++.h
+-
+pfspinstance.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/pfspinstance.h
+flowshop.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/flowshop.h
+Utils.h
+D:/Users/Alexandre/Desktop/ULB/MA2/Heuristic optimization/Projet/repository/Heuristic-optimization-project/src/version c++/Utils.h
+

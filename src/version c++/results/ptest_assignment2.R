@@ -10,6 +10,15 @@ new.getPvalues <- function(aa, bb, myfile) {
   return(pvalues)
 }
 
+new.getSpearmanPvalue <- function(aa, bb, myfile) {
+  a.cost <- myfile[,aa]
+  b.cost <- myfile[,bb]
+  spearman <- cor.test(a.cost, b.cost, method = "spearman")
+  print(paste("spearman test : ", spearman))
+}
+
+####################################################################################
+
 # open files 
 myfile50 <- read.table("SLS_avgrunsRPDs_50.csv", header=TRUE, sep=",")
 myfile100 <- read.table("SLS_avgrunsRPDs_100.csv", header=TRUE, sep=",")
@@ -24,4 +33,9 @@ all_pvalues[2, ] <- c(p[1], p[2]) # append row (ttest p, wilcoxtest p)
 
 # write pvalues to file
 write.table(all_pvalues, file="pvalues_SLS.csv", sep=",", col.names = F)
+
+####################################################################################
+
+sp <- new.getSpearmanPvalue("GA", "TS", myfile50)
+sp <- new.getSpearmanPvalue("GA", "TS", myfile100)
 

@@ -25,7 +25,7 @@ def plotRTDp(col, col_name, N):
     # plotting a line graph
     plt.plot(df["X"], df["Y"], label=col_name)
 
-def plotAllRTD(all_timings, cols, N, algo, smooth=False):
+def plotAllRTD(all_timings, cols, N, algo, instance_name, smooth=False):
     for c in cols:
         all_timings.sort_values(by=[c], inplace=True)
         if smooth:
@@ -33,7 +33,7 @@ def plotAllRTD(all_timings, cols, N, algo, smooth=False):
         else:
             plotRTDp(all_timings[c], c, N)
     plt.legend()
-    plt.title(f"Qualified Run-time distributions - {algo} - {N} iterations")
+    plt.title(f"Qualified Run-time distributions - {algo} - {N} iterations - instance {instance_name}")
     plt.ylabel('P(solve)')
     plt.xlabel('Run-time [CPU sec]')
     plt.show()
@@ -50,13 +50,21 @@ def main():
 
     N = 25
 
-    all_timings_GA = getTimingsP(filename_RTD1)
-    plotAllRTD(all_timings_GA, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA")
-    plotAllRTD(all_timings_GA, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA", True)
+    all_timings_inst1 = getTimingsP(filename_RTD1)
 
-    all_timings_TS = getTimingsP(filename_RTD2)
-    plotAllRTD(all_timings_TS, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS")
-    plotAllRTD(all_timings_TS, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS", True)
+    plotAllRTD(all_timings_inst1, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA", "50_20_01")
+    plotAllRTD(all_timings_inst1, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA", "50_20_01", True) # smooth
+
+    plotAllRTD(all_timings_inst1, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS", "50_20_01")
+    plotAllRTD(all_timings_inst1, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS", "50_20_01", True) # smooth
+
+    all_timings_inst2 = getTimingsP(filename_RTD2)
+
+    plotAllRTD(all_timings_inst2, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA", "50_20_02")
+    plotAllRTD(all_timings_inst2, ["BK", "GA01", "GA05", "GA1", "GA2"], N, "GA", "50_20_02", True)  # smooth
+
+    plotAllRTD(all_timings_inst2, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS", "50_20_02")
+    plotAllRTD(all_timings_inst2, ["BK", "TS01", "TS05", "TS1", "TS2"], N, "TS", "50_20_02", True)  # smooth
 
 
 

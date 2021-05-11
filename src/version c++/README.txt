@@ -10,7 +10,8 @@ make
 
 e.g. ./flowshopRUN II R FI T instances/50_20_01
 e.g. ./flowshopRUN VND SRZ T E I instances/100_20_01
-e.g. ./flowshopRUN runAllExperiments
+e.g. ./flowshopRUN runAllExperimentsA1
 e.g. ./flowshopRUN TS 7 150.0 instances/50_20_01
+e.g. ./flowshopRUN runAllExperimentsA2
 e.g. ./flowshopRUN GA 0.5 1.0 0.4 100 50 350.0 instances/50_20_01
 
