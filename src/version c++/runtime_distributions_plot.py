@@ -33,7 +33,7 @@ def plotAllRTD(all_timings, cols, N, algo, smooth=False):
         else:
             plotRTDp(all_timings[c], c, N)
     plt.legend()
-    plt.title("Qualified Run-time distributions - " + algo)
+    plt.title(f"Qualified Run-time distributions - {algo} - {N} iterations")
     plt.ylabel('P(solve)')
     plt.xlabel('Run-time [CPU sec]')
     plt.show()

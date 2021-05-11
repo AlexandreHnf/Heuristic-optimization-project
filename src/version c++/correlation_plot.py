@@ -10,6 +10,11 @@ def correlationPlot(all_avg_rpds, job_nb):
     ax.scatter(x, y, s=15, marker="D")
     ax.set_xlabel("SLS 1 : Genetic algorithm : average RPDs")
     ax.set_ylabel("SLS 2 : Tabu search : average RPDs")
+    xy = x + y
+    min_lim = min(xy) - 0.05
+    max_lim = max(xy) + 0.05
+    ax.set_xlim([min_lim, max_lim])
+    ax.set_ylim([min_lim, max_lim])
     plt.tight_layout()
     plt.show()
 
