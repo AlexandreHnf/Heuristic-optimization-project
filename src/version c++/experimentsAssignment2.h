@@ -33,7 +33,7 @@
 // ======== RTD PARAMETERS
 #define NB_ITERATIONS 25
 #define NB_INSTANCES 2
-#define MAX_TIMING 200.0
+#define MAX_TIMING 1000.0
 
 /***************************************************************************/
 // Some Unit tests of MGA and Tabu
